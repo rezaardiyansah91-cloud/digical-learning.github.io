@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Digical IDE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .admin-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.08); border-top: 4px solid #667eea; }
+        .stat-number { font-size: 32px; font-weight: bold; color: #667eea; margin: 10px 0; }
+        .user-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .user-table th { background: #667eea; color: white; padding: 15px; text-align: left; }
+        .user-table td { padding: 15px; border-bottom: 1px solid #eee; }
+        .user-table tr:hover { background: #f8f9fa; }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .status-pending { background: #ffc107; color: #333; }
+        .status-approved { background: #28a745; color: white; }
+        .status-suspended { background: #6c757d; color: white; }
+        .status-rejected { background: #dc3545; color: white; }
+        .btn-small { padding: 5px 10px; font-size: 11px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 2px; cursor: pointer; border: none; }
+        .btn-approve { background: #28a745; color: white; }
+        .btn-reject { background: #dc3545; color: white; }
+        .btn-suspend { background: #ffc107; color: #333; }
+        .btn-delete { background: #343a40; color: white; }
+        .btn-reactivate { background: #20c997; color: white; }
+        .login-form { max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .tab-navigation { display: flex; border-bottom: 2px solid #dee2e6; margin: 20px 0; gap: 10px; }
+        .tab-button { padding: 12px 25px; background: none; border: none; cursor: pointer; font-size: 16px; border-bottom: 3px solid transparent; }
+        .tab-button.active { color: #667eea; border-bottom-color: #667eea; font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .search-box { display: flex; gap: 10px; margin: 20px 0; }
+        .search-input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+        
+        const ADMIN_EMAIL = 'abdulaziz.ir@gmail.com';
+        const ADMIN_PASSWORD = 'admin123'; // Ganti dengan password admin
+        
+        let currentUser = null;
+        
+        async function checkAdmin() {
+            const adminData = localStorage.getItem('admin');
+            if (adminData) {
+                currentUser = JSON.parse(adminData);
+                renderAdminPanel();
+            } else {
+                renderLoginForm();
+            }
+        }
+        
+        function renderLoginForm() {
+            document.getElementById('app').innerHTML = `
+                <div class="login-form">
+                    <h2>🔐 Admin Login</h2>
+                    <div id="loginMessage"></div>
+                    <form id="adminLoginForm">
+                        <div class="form-group">
+                            <label>Email Admin:</label>
+                            <input type="email" id="email" value="${ADMIN_EMAIL}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        <button type="submit">Login sebagai Admin</button>
+                    </form>
+                </div>
+            `;
+            
+            document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const msgDiv = document.getElementById('loginMessage');
+                
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    // Cek apakah admin (role = admin di Firestore)
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    const userData = userDoc.data();
+                    
+                    if (userData && userData.role === 'admin') {
+                        localStorage.setItem('admin', JSON.stringify({ uid: user.uid, email: user.email }));
+                        currentUser = { uid: user.uid, email: user.email };
+                        renderAdminPanel();
+                    } else {
+                        msgDiv.innerHTML = '<div class="message error">Akun ini bukan admin!</div>';
+                        await signOut(auth);
+                    }
+                } catch (error) {
+                    msgDiv.innerHTML = `<div class="message error">Login gagal: ${error.message}</div>`;
+                }
+            });
+        }
+        
+        async function renderAdminPanel() {
+            // Ambil semua users
+            const usersRef = collection(db, "users");
+            const snapshot = await getDocs(usersRef);
+            const users = [];
+            snapshot.forEach(doc => {
+                users.push({ id: doc.id, ...doc.data() });
+            });
+            
+            const pendingUsers = users.filter(u => u.status === 'pending');
+            const approvedUsers = users.filter(u => u.status === 'approved');
+            const suspendedUsers = users.filter(u => u.status === 'suspended');
+            
+            document.getElementById('app').innerHTML = `
+                <div class="admin-container">
+                    <div class="admin-header">
+                        <div>
+                            <h2>👨‍💼 Admin Dashboard</h2>
+                            <p>Digical IDE User Management System</p>
+                        </div>
+                        <button id="logoutAdminBtn" class="btn" style="background: rgba(255,255,255,0.2);">Logout</button>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-number">${users.length}</div><div class="stat-label">Total Users</div></div>
+                        <div class="stat-card"><div class="stat-number">${pendingUsers.length}</div><div class="stat-label">Pending Approval</div></div>
+                        <div class="stat-card"><div class="stat-number">${approvedUsers.length}</div><div class="stat-label">Active Users</div></div>
+                        <div class="stat-card"><div class="stat-number">${suspendedUsers.length}</div><div class="stat-label">Suspended</div></div>
+                    </div>
+                    
+                    <div class="tab-navigation">
+                        <button class="tab-button active" data-tab="pending">⏳ Pending (${pendingUsers.length})</button>
+                        <button class="tab-button" data-tab="approved">✅ Active (${approvedUsers.length})</button>
+                        <button class="tab-button" data-tab="suspended">⏸️ Suspended (${suspendedUsers.length})</button>
+                    </div>
+                    
+                    <div class="search-box">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search by username or email...">
+                        <button id="searchBtn" class="btn">Search</button>
+                        <button id="clearBtn" class="btn" style="background:#6c757d;">Clear</button>
+                    </div>
+                    
+                    <div id="pending-tab" class="tab-content active">
+                        ${renderUserTable(pendingUsers, 'pending')}
+                    </div>
+                    <div id="approved-tab" class="tab-content">
+                        ${renderUserTable(approvedUsers, 'approved')}
+                    </div>
+                    <div id="suspended-tab" class="tab-content">
+                        ${renderUserTable(suspendedUsers, 'suspended')}
+                    </div>
+                </div>
+            `;
+            
+            // Tab switching
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const tab = btn.dataset.tab;
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${tab}-tab`).classList.add('active');
+                });
+            });
+            
+            // Search functionality
+            document.getElementById('searchBtn').addEventListener('click', () => searchUsers(users));
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                document.getElementById('searchInput').value = '';
+                location.reload();
+            });
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchUsers(users);
+            });
+            
+            // Logout
+            document.getElementById('logoutAdminBtn').addEventListener('click', async () => {
+                await signOut(auth);
+                localStorage.removeItem('admin');
+                currentUser = null;
+                renderLoginForm();
+            });
+        }
+        
+        function renderUserTable(users, tabType) {
+            if (users.length === 0) {
+                return `<div class="empty-state"><h3>Tidak ada user</h3></div>`;
+            }
+            
+            return `
+                <table class="user-table">
+                    <thead><tr><th>UID</th><th>Username</th><th>Email</th><th>Nama</th><th>Status</th><th>Aksi</th></tr></thead>
+                    <tbody>
+                        ${users.map(user => `
+                            <tr data-uid="${user.uid}" data-username="${user.username || ''}" data-email="${user.email}">
+                                <td>${user.uid.substring(0, 8)}...</td>
+                                <td>${user.username || '-'}</td>
+                                <td>${user.email}</td>
+                                <td>${user.fullName || '-'}</td>
+                                <td><span class="status-badge status-${user.status}">${user.status?.toUpperCase() || 'PENDING'}</span></td>
+                                <td>${getActionButtons(user, tabType)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        function getActionButtons(user, tabType) {
+            const buttons = [];
+            
+            if (tabType === 'pending') {
+                buttons.push(`<button class="btn-small btn-approve" onclick="window.approveUser('${user.uid}')">✅ Approve</button>`);
+                buttons.push(`<button class="btn-small btn-reject" onclick="window.rejectUser('${user.uid}')">❌ Reject</button>`);
+            }
+            
+            if (tabType === 'approved') {
+                buttons.push(`<button class="btn-small btn-suspend" onclick="window.suspendUser('${user.uid}')">⏸️ Suspend</button>`);
+                buttons.push(`<button class="btn-small btn-delete" onclick="window.deleteUser('${user.uid}')">🗑️ Delete</button>`);
+            }
+            
+            if (tabType === 'suspended') {
+                buttons.push(`<button class="btn-small btn-reactivate" onclick="window.reactivateUser('${user.uid}')">🔄 Reactivate</button>`);
+                buttons.push(`<button class="btn-small btn-delete" onclick="window.deleteUser('${user.uid}')">🗑️ Delete</button>`);
+            }
+            
+            return buttons.join(' ');
+        }
+        
+        // Global functions for actions
+        window.approveUser = async (uid) => {
+            if (confirm('Approve user ini?')) {
+                await updateDoc(doc(db, "users", uid), { status: 'approved' });
+                location.reload();
+            }
+        };
+        
+        window.rejectUser = async (uid) => {
+            if (confirm('Reject user ini?')) {
+                await updateDoc(doc(db, "users", uid), { status: 'rejected' });
+                location.reload();
+            }
+        };
+        
+        window.suspendUser = async (uid) => {
+            if (confirm('Non-aktifkan user ini?')) {
+                await updateDoc(doc(db, "users", uid), { status: 'suspended' });
+                location.reload();
+            }
+        };
+        
+        window.reactivateUser = async (uid) => {
+            if (confirm('Aktifkan kembali user ini?')) {
+                await updateDoc(doc(db, "users", uid), { status: 'approved' });
+                location.reload();
+            }
+        };
+        
+        window.deleteUser = async (uid) => {
+            if (confirm('HAPUS PERMANEN user ini? Tindakan tidak dapat dibatalkan!')) {
+                await deleteDoc(doc(db, "users", uid));
+                location.reload();
+            }
+        };
+        
+        function searchUsers(allUsers) {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+            let filtered = allUsers.filter(u => {
+                if (activeTab !== 'pending' && u.status !== activeTab) return false;
+                if (activeTab === 'pending' && u.status !== 'pending') return false;
+                return (u.username?.toLowerCase().includes(term) || u.email?.toLowerCase().includes(term));
+            });
+            
+            document.getElementById(`${activeTab}-tab`).innerHTML = renderUserTable(filtered, activeTab);
+        }
+        
+        checkAdmin();
+    </script>
+</body>
+</html>

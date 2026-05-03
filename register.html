@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Digical IDE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .approval-info { background: #e8f4fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .admin-contact { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 15px 0; border-radius: 4px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container auth-container">
+        <h1>Register Digical IDE</h1>
+        
+        <div id="message"></div>
+        
+        <div class="approval-info">
+            <strong>⚠️ Perhatian:</strong> Semua pendaftaran membutuhkan approval dari admin.
+            Anda akan menerima email konfirmasi setelah akun diaktifkan.
+        </div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="fullName">Nama Lengkap:</label>
+                <input type="text" id="fullName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Konfirmasi Password:</label>
+                <input type="password" id="confirmPassword" required>
+            </div>
+            
+            <button type="submit">Daftar & Request Approval</button>
+        </form>
+        
+        <div class="links">
+            <a href="login.html">Sudah punya akun? Login</a>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+        
+        const form = document.getElementById('registerForm');
+        const messageDiv = document.getElementById('message');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validasi
+            if (!fullName || !username || !email || !password) {
+                showMessage('Semua field harus diisi!', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('Password dan konfirmasi tidak sama!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Password minimal 6 karakter!', 'error');
+                return;
+            }
+            
+            try {
+                // Buat user di Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Simpan data ke Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    fullName: fullName,
+                    username: username,
+                    email: email,
+                    status: "pending",
+                    role: "user",
+                    createdAt: new Date(),
+                    uid: user.uid
+                });
+                
+                // Log approval request
+                console.log('Pendaftaran baru:', { fullName, username, email });
+                
+                showMessage(`✅ Pendaftaran berhasil!<br><br>
+                    Akun Anda akan diaktifkan dalam waktu 1x24 jam.<br><br>
+                    Silakan hubungi admin di: <strong>abdulaziz.ir@gmail.com</strong><br><br>
+                    <a href="login.html" class="btn">Kembali ke Login</a>`, 'success');
+                
+                form.style.display = 'none';
+                
+            } catch (error) {
+                console.error(error);
+                if (error.code === 'auth/email-already-in-use') {
+                    showMessage('Email sudah terdaftar!', 'error');
+                } else {
+                    showMessage('Terjadi kesalahan: ' + error.message, 'error');
+                }
+            }
+        });
+        
+        function showMessage(msg, type) {
+            messageDiv.innerHTML = `<div class="message ${type}">${msg}</div>`;
+        }
+    </script>
+</body>
+</html>

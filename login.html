@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Digical IDE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .approval-info { background: #e8f4fd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container auth-container">
+        <h1>Login Digical IDE</h1>
+        
+        <div id="message"></div>
+        
+        <div class="approval-info">
+            <strong>⚠️ Informasi:</strong> Semua akun membutuhkan approval admin sebelum dapat login.
+            Proses approval memakan waktu maksimal 1x24 jam.
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            
+            <button type="submit">Login</button>
+        </form>
+        
+        <div class="links">
+            <a href="register.html">Belum punya akun? Register</a>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
+            <strong>Butuh bantuan?</strong><br>
+            Hubungi admin: <strong>abdulaziz.ir@gmail.com</strong>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+        
+        const form = document.getElementById('loginForm');
+        const messageDiv = document.getElementById('message');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Ambil data dari Firestore
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                const userData = userDoc.data();
+                
+                if (!userData) {
+                    showMessage('Data user tidak ditemukan!', 'error');
+                    return;
+                }
+                
+                // Cek status approval
+                if (userData.status === 'pending') {
+                    showMessage('Akun Anda masih menunggu approval dari admin.<br>Silakan hubungi admin: <strong>abdulaziz.ir@gmail.com</strong>', 'error');
+                    await auth.signOut();
+                } else if (userData.status === 'rejected') {
+                    showMessage('Akun Anda ditolak oleh admin. Hubungi admin untuk info lebih lanjut.', 'error');
+                    await auth.signOut();
+                } else if (userData.status === 'suspended') {
+                    showMessage('Akun Anda sedang dinonaktifkan. Hubungi admin.', 'error');
+                    await auth.signOut();
+                } else {
+                    // Approved - simpan ke session/localStorage
+                    localStorage.setItem('user', JSON.stringify({
+                        uid: user.uid,
+                        email: user.email,
+                        fullName: userData.fullName,
+                        username: userData.username,
+                        role: userData.role
+                    }));
+                    window.location.href = 'dashboard.html';
+                }
+                
+            } catch (error) {
+                console.error(error);
+                if (error.code === 'auth/invalid-credential') {
+                    showMessage('Email atau password salah!', 'error');
+                } else {
+                    showMessage('Login gagal: ' + error.message, 'error');
+                }
+            }
+        });
+        
+        function showMessage(msg, type) {
+            messageDiv.innerHTML = `<div class="message ${type}">${msg}</div>`;
+        }
+    </script>
+</body>
+</html>
