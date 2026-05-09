@@ -25,9 +25,9 @@ const USERS_DATA = {
         },
         {
             id: 3,
-            username: "testuser",
+            username: "abdulaziz",
             email: "test@example.com",
-            status: "pending",
+            status: "approved",
             isAdmin: false,
             createdAt: "2026-05-09"
         },
