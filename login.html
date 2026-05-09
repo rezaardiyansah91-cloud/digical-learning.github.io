@@ -60,7 +60,7 @@
             font-weight: 500;
         }
         
-        input, select {
+        input {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
@@ -69,7 +69,7 @@
             transition: all 0.3s;
         }
         
-        input:focus, select:focus {
+        input:focus {
             outline: none;
             border-color: #4285f4;
             box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
@@ -93,12 +93,6 @@
             opacity: 0.95;
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(66, 133, 244, 0.4);
-        }
-        
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
         }
         
         .message {
@@ -157,6 +151,28 @@
             font-size: 12px;
             color: #1a73e8;
             text-align: center;
+        }
+        
+        .status-local {
+            background: #cce5ff;
+            color: #004085;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .show-pwd {
+            margin-top: 5px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .show-pwd input {
+            width: auto;
         }
         
         /* Admin Dashboard */
@@ -283,10 +299,6 @@
             color: #4285f4;
         }
         
-        .modal-content .form-group {
-            margin-bottom: 15px;
-        }
-        
         .modal-actions {
             display: flex;
             gap: 10px;
@@ -300,28 +312,6 @@
             margin-bottom: 20px;
             font-size: 13px;
             border-left: 4px solid #ffc107;
-        }
-        
-        .status-local {
-            background: #cce5ff;
-            color: #004085;
-            padding: 8px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 12px;
-        }
-        
-        .show-pwd {
-            margin-top: 5px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .show-pwd input {
-            width: auto;
         }
         
         @media (max-width: 600px) {
@@ -343,7 +333,7 @@
         
         <div id="message" class="message"></div>
         
-        <!-- ========== LOGIN FORM ========== -->
+        <!-- ========== LOGIN FORM (dengan password) ========== -->
         <div id="loginForm">
             <div class="form-group">
                 <label>👤 Username atau Email</label>
@@ -484,10 +474,8 @@
             if (typeof USERS_DATA !== 'undefined') {
                 users = JSON.parse(JSON.stringify(USERS_DATA.users || []));
                 adminCode = USERS_DATA.adminCode || 'admin123';
-                console.log('✅ Loaded:', users.length, 'users');
                 document.getElementById('statusLocal').innerHTML = `💾 ${users.length} user • Data dari users.js`;
             } else {
-                console.warn('USERS_DATA not found');
                 adminCode = 'admin123';
                 users = [];
                 document.getElementById('statusLocal').innerHTML = `⚠️ users.js tidak ditemukan`;
@@ -496,9 +484,7 @@
             const savedUsers = localStorage.getItem('digical_users_temp');
             if (savedUsers) {
                 const tempUsers = JSON.parse(savedUsers);
-                if (tempUsers.length > 0) {
-                    users = tempUsers;
-                }
+                if (tempUsers.length > 0) users = tempUsers;
             }
         }
         
@@ -528,7 +514,7 @@
             pwdField.type = checkbox.checked ? 'text' : 'password';
         }
         
-        // ========== LOGIN ==========
+        // ========== LOGIN (dengan PASSWORD) ==========
         function handleLogin() {
             const credential = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -553,6 +539,7 @@
                 return;
             }
             
+            // Cek password (plain text)
             if (user.password !== password) {
                 showMessage('Password salah!', 'error');
                 return;
