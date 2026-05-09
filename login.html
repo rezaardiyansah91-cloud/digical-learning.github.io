@@ -25,7 +25,7 @@
             background: white;
             border-radius: 20px;
             padding: 40px;
-            max-width: 700px;
+            max-width: 450px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: fadeInUp 0.5s ease-out;
@@ -60,7 +60,7 @@
             font-weight: 500;
         }
         
-        input {
+        input, select {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
@@ -69,7 +69,7 @@
             transition: all 0.3s;
         }
         
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #4285f4;
             box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
@@ -95,8 +95,10 @@
             box-shadow: 0 5px 20px rgba(66, 133, 244, 0.4);
         }
         
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d, #5a6268);
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
         
         .message {
@@ -125,13 +127,6 @@
             background: #fff3cd;
             color: #856404;
             border-left: 4px solid #856404;
-            display: block;
-        }
-        
-        .message.info {
-            background: #e3f2fd;
-            color: #1565c0;
-            border-left: 4px solid #1565c0;
             display: block;
         }
         
@@ -307,13 +302,6 @@
             border-left: 4px solid #ffc107;
         }
         
-        .edit-hint code {
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-        
         .status-local {
             background: #cce5ff;
             color: #004085;
@@ -322,6 +310,18 @@
             margin-bottom: 15px;
             text-align: center;
             font-size: 12px;
+        }
+        
+        .show-pwd {
+            margin-top: 5px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .show-pwd input {
+            width: auto;
         }
         
         @media (max-width: 600px) {
@@ -337,9 +337,8 @@
         <h1>🚀 Digical IDE</h1>
         <div class="subtitle" id="pageSubtitle">Login untuk mengakses platform</div>
         
-        <!-- Status Data -->
         <div id="statusLocal" class="status-local">
-            💾 Mode Local • Data dari file users.js
+            💾 Mode Local • Data dari users.js
         </div>
         
         <div id="message" class="message"></div>
@@ -350,6 +349,14 @@
                 <label>👤 Username atau Email</label>
                 <input type="text" id="loginUsername" placeholder="Masukkan username atau email">
             </div>
+            <div class="form-group">
+                <label>🔒 Password</label>
+                <input type="password" id="loginPassword" placeholder="Masukkan password">
+                <div class="show-pwd">
+                    <input type="checkbox" id="showPassword" onclick="togglePassword()"> 
+                    <label for="showPassword">Tampilkan password</label>
+                </div>
+            </div>
             <button onclick="handleLogin()">🔐 Login ke Digical IDE</button>
             
             <div class="links">
@@ -358,8 +365,7 @@
             </div>
             
             <div class="info-box">
-                <strong>💡 Informasi:</strong> Akun dibuat dan dikelola langsung oleh admin melalui file users.js.
-                Hubungi admin untuk pendaftaran akun baru.
+                <strong>💡 Informasi:</strong> Gunakan username/email dan password. Hubungi admin untuk pendaftaran.
             </div>
         </div>
         
@@ -381,8 +387,7 @@
             </div>
             
             <div class="info-box">
-                <strong>🔧 Kode Admin Default:</strong> <code></code><br>
-                <small>Ganti kode di file users.js</small>
+                <strong>🔧 Kode Admin:</strong> Sesuai setting di users.js
             </div>
         </div>
         
@@ -397,8 +402,7 @@
             </div>
             
             <div class="edit-hint">
-                <strong>📝 Edit Manual di File:</strong> Buka file <code>users.js</code> dan edit langsung di GitHub.<br>
-                <strong>Edit Sementara:</strong> Perubahan di bawah akan tersimpan di browser. Untuk permanen, copy ke <code>users.js</code>.
+                <strong>📝 Edit Manual:</strong> Buka file <code>users.js</code> dan edit langsung di GitHub.
             </div>
             
             <div id="adminStats" class="stats-grid"></div>
@@ -415,7 +419,7 @@
             
             <div id="userList" class="user-list"></div>
             
-            <button onclick="showLogin()" class="btn-secondary" style="margin-top: 20px;">← Kembali ke Login</button>
+            <button onclick="showLogin()" style="margin-top: 20px; background: #6c757d; color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%;">← Kembali ke Login</button>
         </div>
         
         <!-- ========== ADD/EDIT USER MODAL ========== -->
@@ -431,6 +435,10 @@
                     <input type="email" id="modalEmail" placeholder="Email">
                 </div>
                 <div class="form-group">
+                    <label>Password</label>
+                    <input type="text" id="modalPassword" placeholder="Password untuk user">
+                </div>
+                <div class="form-group">
                     <label>Status</label>
                     <select id="modalStatus">
                         <option value="approved">✅ Approved</option>
@@ -444,6 +452,21 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Reset Password Modal -->
+        <div id="resetPasswordModal" class="modal">
+            <div class="modal-content">
+                <h3>🔑 Reset Password</h3>
+                <div class="form-group">
+                    <label>Password Baru</label>
+                    <input type="text" id="newPassword" placeholder="Password baru">
+                </div>
+                <div class="modal-actions">
+                    <button onclick="resetUserPassword()" style="flex: 1;">Reset Password</button>
+                    <button onclick="closeResetModal()" style="flex: 1; background: #6c757d;">Batal</button>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Load data user dari users.js -->
@@ -454,32 +477,27 @@
         let users = [];
         let adminCode = 'admin123';
         let editingUserId = null;
+        let resetPasswordUserId = null;
         
         // ========== INITIALIZATION ==========
         function initData() {
-            // Load dari USERS_DATA yang didefinisikan di users.js
             if (typeof USERS_DATA !== 'undefined') {
                 users = JSON.parse(JSON.stringify(USERS_DATA.users || []));
                 adminCode = USERS_DATA.adminCode || 'admin123';
-                console.log('✅ Data loaded from users.js:', users.length, 'users');
-                document.getElementById('statusLocal').innerHTML = `💾 Mode Local • ${users.length} user dari users.js`;
+                console.log('✅ Loaded:', users.length, 'users');
+                document.getElementById('statusLocal').innerHTML = `💾 ${users.length} user • Data dari users.js`;
             } else {
-                console.warn('USERS_DATA not found, using default');
+                console.warn('USERS_DATA not found');
                 adminCode = 'admin123';
-                users = [
-                    { id: 1, username: 'admin', email: 'admin@digical.com', status: 'approved', isAdmin: true, createdAt: new Date().toISOString().split('T')[0] }
-                ];
-                document.getElementById('statusLocal').innerHTML = `⚠️ users.js tidak ditemukan, menggunakan default`;
+                users = [];
+                document.getElementById('statusLocal').innerHTML = `⚠️ users.js tidak ditemukan`;
             }
             
-            // Load perubahan sementara dari localStorage (jika ada)
             const savedUsers = localStorage.getItem('digical_users_temp');
             if (savedUsers) {
                 const tempUsers = JSON.parse(savedUsers);
                 if (tempUsers.length > 0) {
                     users = tempUsers;
-                    console.log('📦 Loaded from localStorage (temporary changes)');
-                    document.getElementById('statusLocal').innerHTML = `💾 Mode Local • ${users.length} user (dengan perubahan sementara)`;
                 }
             }
         }
@@ -488,14 +506,13 @@
             localStorage.setItem('digical_users_temp', JSON.stringify(users));
         }
         
-        // ========== UTILITY ==========
         function showMessage(msg, type) {
             const msgDiv = document.getElementById('message');
             msgDiv.textContent = msg;
             msgDiv.className = `message ${type}`;
             setTimeout(() => {
                 msgDiv.className = 'message';
-            }, 3000);
+            }, 4000);
         }
         
         function escapeHtml(text) {
@@ -505,12 +522,24 @@
             return div.innerHTML;
         }
         
+        function togglePassword() {
+            const pwdField = document.getElementById('loginPassword');
+            const checkbox = document.getElementById('showPassword');
+            pwdField.type = checkbox.checked ? 'text' : 'password';
+        }
+        
         // ========== LOGIN ==========
         function handleLogin() {
             const credential = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
             
             if (!credential) {
                 showMessage('Masukkan username atau email!', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showMessage('Masukkan password!', 'error');
                 return;
             }
             
@@ -520,7 +549,12 @@
             );
             
             if (!user) {
-                showMessage('Akun tidak ditemukan! Hubungi admin untuk pendaftaran.', 'error');
+                showMessage('Akun tidak ditemukan!', 'error');
+                return;
+            }
+            
+            if (user.password !== password) {
+                showMessage('Password salah!', 'error');
                 return;
             }
             
@@ -530,11 +564,10 @@
             }
             
             if (user.status === 'suspended') {
-                showMessage('⚠️ Akun telah dinonaktifkan. Hubungi admin.', 'error');
+                showMessage('⚠️ Akun telah dinonaktifkan.', 'error');
                 return;
             }
             
-            // Login sukses
             localStorage.setItem('digical_current_user', JSON.stringify(user));
             showMessage(`✅ Selamat datang, ${user.username}!`, 'success');
             
@@ -546,12 +579,10 @@
         // ========== ADMIN ==========
         function loginAdmin() {
             const code = document.getElementById('adminCode').value;
-            
             if (code !== adminCode) {
                 showMessage('Kode admin salah!', 'error');
                 return;
             }
-            
             showAdminDashboard();
         }
         
@@ -575,9 +606,10 @@
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('pageSubtitle').textContent = 'Login untuk mengakses platform';
+            document.getElementById('pageSubtitle').textContent = 'Login';
             document.getElementById('message').className = 'message';
             document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
         }
         
         function logoutAdmin() {
@@ -598,7 +630,6 @@
                 <div class="stat-card"><div class="stat-number">${pending}</div><div class="stat-label">Pending</div></div>
                 <div class="stat-card"><div class="stat-number">${suspended}</div><div class="stat-label">Suspended</div></div>
             `;
-            
             renderUserList();
         }
         
@@ -620,11 +651,7 @@
             }
             
             if (filtered.length === 0) {
-                document.getElementById('userList').innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #999;">
-                        <i>📭</i> Tidak ada user
-                    </div>
-                `;
+                document.getElementById('userList').innerHTML = `<div style="text-align: center; padding: 40px; color: #999;">📭 Tidak ada user</div>`;
                 return;
             }
             
@@ -640,6 +667,7 @@
                     </div>
                     <div class="user-actions">
                         <button onclick="editUser(${user.id})" style="background: #17a2b8;">✏️ Edit</button>
+                        <button onclick="showResetPasswordModal(${user.id})" style="background: #ffc107; color:#333;">🔑 Reset Pwd</button>
                         ${user.status === 'pending' ? `<button onclick="changeStatus(${user.id}, 'approved')" style="background: #28a745;">✅ Approve</button>` : ''}
                         ${user.status === 'approved' ? `<button onclick="changeStatus(${user.id}, 'suspended')" style="background: #ffc107; color:#333;">⏸️ Suspend</button>` : ''}
                         ${user.status === 'suspended' ? `<button onclick="changeStatus(${user.id}, 'approved')" style="background: #17a2b8;">🔄 Aktifkan</button>` : ''}
@@ -653,14 +681,13 @@
             renderUserList();
         }
         
-        // ========== USER MANAGEMENT ==========
         function changeStatus(userId, newStatus) {
             const user = users.find(u => u.id === userId);
             if (user) {
                 user.status = newStatus;
                 saveToLocalStorage();
                 renderDashboard();
-                showMessage(`✅ Status user "${user.username}" diubah menjadi ${newStatus}`, 'success');
+                showMessage(`✅ Status "${user.username}" = ${newStatus}`, 'success');
                 showPermanentSaveHint();
             }
         }
@@ -681,6 +708,7 @@
             document.getElementById('modalTitle').textContent = '➕ Tambah User Baru';
             document.getElementById('modalUsername').value = '';
             document.getElementById('modalEmail').value = '';
+            document.getElementById('modalPassword').value = '';
             document.getElementById('modalStatus').value = 'pending';
             document.getElementById('userModal').style.display = 'flex';
         }
@@ -689,9 +717,10 @@
             const user = users.find(u => u.id === userId);
             if (user) {
                 editingUserId = userId;
-                document.getElementById('modalTitle').textContent = `✏️ Edit User: ${user.username}`;
+                document.getElementById('modalTitle').textContent = `✏️ Edit: ${user.username}`;
                 document.getElementById('modalUsername').value = user.username;
                 document.getElementById('modalEmail').value = user.email;
+                document.getElementById('modalPassword').value = user.password || '';
                 document.getElementById('modalStatus').value = user.status;
                 document.getElementById('userModal').style.display = 'flex';
             }
@@ -700,6 +729,7 @@
         function saveUserFromModal() {
             const username = document.getElementById('modalUsername').value.trim();
             const email = document.getElementById('modalEmail').value.trim();
+            const password = document.getElementById('modalPassword').value;
             const status = document.getElementById('modalStatus').value;
             
             if (!username || !email) {
@@ -708,27 +738,30 @@
             }
             
             if (editingUserId) {
-                // Edit existing
                 const user = users.find(u => u.id === editingUserId);
                 if (user) {
                     user.username = username;
                     user.email = email;
                     user.status = status;
-                    showMessage(`✅ User "${username}" berhasil diupdate`, 'success');
+                    if (password) user.password = password;
+                    showMessage(`✅ User "${username}" diupdate`, 'success');
                 }
             } else {
-                // Add new
+                if (!password) {
+                    showMessage('Password harus diisi!', 'error');
+                    return;
+                }
                 const maxId = users.length > 0 ? Math.max(...users.map(u => u.id)) : 0;
-                const newId = maxId + 1;
                 users.push({
-                    id: newId,
+                    id: maxId + 1,
                     username: username,
                     email: email,
+                    password: password,
                     status: status,
                     isAdmin: false,
                     createdAt: new Date().toISOString().split('T')[0]
                 });
-                showMessage(`✅ User "${username}" berhasil ditambahkan`, 'success');
+                showMessage(`✅ User "${username}" ditambahkan`, 'success');
             }
             
             saveToLocalStorage();
@@ -742,57 +775,64 @@
             editingUserId = null;
         }
         
+        function showResetPasswordModal(userId) {
+            resetPasswordUserId = userId;
+            document.getElementById('resetPasswordModal').style.display = 'flex';
+            document.getElementById('newPassword').value = '';
+        }
+        
+        function closeResetModal() {
+            document.getElementById('resetPasswordModal').style.display = 'none';
+            resetPasswordUserId = null;
+        }
+        
+        function resetUserPassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            if (!newPassword) {
+                showMessage('Password baru harus diisi!', 'error');
+                return;
+            }
+            const user = users.find(u => u.id === resetPasswordUserId);
+            if (user) {
+                user.password = newPassword;
+                saveToLocalStorage();
+                showMessage(`✅ Password "${user.username}" direset!`, 'success');
+                closeResetModal();
+                showPermanentSaveHint();
+            }
+        }
+        
         function showPermanentSaveHint() {
-            // Tampilkan notifikasi untuk save permanen ke users.js
             const existingHint = document.querySelector('.permanent-hint');
             if (existingHint) existingHint.remove();
             
             const nonAdminUsers = users.filter(u => !u.isAdmin);
-            const exportData = {
-                adminCode: adminCode,
-                users: nonAdminUsers
-            };
+            const exportData = { adminCode: adminCode, users: nonAdminUsers };
             
             const hint = document.createElement('div');
             hint.className = 'permanent-hint';
-            hint.style.position = 'fixed';
-            hint.style.bottom = '20px';
-            hint.style.right = '20px';
-            hint.style.maxWidth = '400px';
-            hint.style.zIndex = '999';
-            hint.style.background = '#fff3cd';
-            hint.style.color = '#856404';
-            hint.style.borderLeft = '4px solid #ffc107';
-            hint.style.borderRadius = '8px';
-            hint.style.padding = '15px';
-            hint.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-            hint.style.fontSize = '12px';
+            hint.style.cssText = 'position:fixed;bottom:20px;right:20px;max-width:400px;z-index:999;background:#fff3cd;color:#856404;border-left:4px solid #ffc107;border-radius:8px;padding:15px;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:12px';
             hint.innerHTML = `
-                <strong>📝 Perubahan bersifat sementara!</strong><br>
-                Edit sudah tersimpan di browser. Agar permanen, copy kode di bawah dan paste ke file <code>users.js</code>:
-                <pre style="font-size: 10px; background: #f8f9fa; padding: 10px; margin-top: 10px; border-radius: 5px; overflow-x: auto; max-height: 200px;">${JSON.stringify(exportData, null, 2)}</pre>
-                <div style="display: flex; gap: 8px; margin-top: 10px;">
-                    <button onclick="copyToClipboard('${encodeURIComponent(JSON.stringify(exportData, null, 2))}')" style="padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">📋 Copy</button>
-                    <button onclick="this.parentElement.parentElement.remove()" style="padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Tutup</button>
-                </div>
+                <strong>📝 Perubahan sementara!</strong><br>
+                Copy kode di bawah ke file <code>users.js</code>:
+                <pre style="font-size:10px;background:#f8f9fa;padding:10px;margin-top:10px;border-radius:5px;overflow:auto;max-height:150px;">${JSON.stringify(exportData, null, 2)}</pre>
+                <button onclick="copyToClipboard('${encodeURIComponent(JSON.stringify(exportData, null, 2))}')" style="padding:5px 10px;background:#28a745;color:white;border:none;border-radius:4px;cursor:pointer;">📋 Copy</button>
+                <button onclick="this.parentElement.remove()" style="padding:5px 10px;background:#6c757d;color:white;border:none;border-radius:4px;cursor:pointer;margin-left:8px;">Tutup</button>
             `;
             document.body.appendChild(hint);
         }
         
         function copyToClipboard(encodedText) {
-            const text = decodeURIComponent(encodedText);
-            navigator.clipboard.writeText(text).then(() => {
-                showMessage('✅ Kode berhasil disalin! Paste ke file users.js', 'success');
-            });
+            navigator.clipboard.writeText(decodeURIComponent(encodedText));
+            showMessage('✅ Kode disalin! Paste ke users.js', 'success');
         }
         
         // ========== INIT ==========
         initData();
         showLogin();
         
-        // Tutup modal dengan ESC
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
+            if (e.key === 'Escape') { closeModal(); closeResetModal(); }
         });
     </script>
 </body>
