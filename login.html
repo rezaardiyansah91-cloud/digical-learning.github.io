@@ -99,10 +99,6 @@
             background: linear-gradient(135deg, #6c757d, #5a6268);
         }
         
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-        }
-        
         .message {
             padding: 12px;
             border-radius: 10px;
@@ -129,6 +125,13 @@
             background: #fff3cd;
             color: #856404;
             border-left: 4px solid #856404;
+            display: block;
+        }
+        
+        .message.info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #1565c0;
             display: block;
         }
         
@@ -311,6 +314,16 @@
             font-family: monospace;
         }
         
+        .status-local {
+            background: #cce5ff;
+            color: #004085;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
         @media (max-width: 600px) {
             .container { padding: 20px; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -323,6 +336,11 @@
     <div class="container" id="app">
         <h1>🚀 Digical IDE</h1>
         <div class="subtitle" id="pageSubtitle">Login untuk mengakses platform</div>
+        
+        <!-- Status Data -->
+        <div id="statusLocal" class="status-local">
+            💾 Mode Local • Data dari file users.js
+        </div>
         
         <div id="message" class="message"></div>
         
@@ -379,8 +397,8 @@
             </div>
             
             <div class="edit-hint">
-                <strong>📝 Cara Edit Manual:</strong> User bisa diedit langsung di file <code>users.js</code>. 
-                Setelah mengedit file, refresh halaman ini.
+                <strong>📝 Edit Manual di File:</strong> Buka file <code>users.js</code> dan edit langsung di GitHub.<br>
+                <strong>Edit Sementara:</strong> Perubahan di bawah akan tersimpan di browser. Untuk permanen, copy ke <code>users.js</code>.
             </div>
             
             <div id="adminStats" class="stats-grid"></div>
@@ -424,10 +442,6 @@
                     <button onclick="saveUserFromModal()" style="flex: 1;">💾 Simpan</button>
                     <button onclick="closeModal()" style="flex: 1; background: #6c757d;">Batal</button>
                 </div>
-                <div class="info-box" style="margin-top: 15px; font-size: 11px;">
-                    <strong>ℹ️ Catatan:</strong> Perubahan akan disimpan ke localStorage sementara. 
-                    Untuk permanen, copy data dan paste ke file users.js
-                </div>
             </div>
         </div>
     </div>
@@ -445,36 +459,33 @@
         function initData() {
             // Load dari USERS_DATA yang didefinisikan di users.js
             if (typeof USERS_DATA !== 'undefined') {
-                users = JSON.parse(JSON.stringify(USERS_DATA.users)); // Deep copy
-                adminCode = USERS_DATA.adminCode;
+                users = JSON.parse(JSON.stringify(USERS_DATA.users || []));
+                adminCode = USERS_DATA.adminCode || 'admin123';
                 console.log('✅ Data loaded from users.js:', users.length, 'users');
+                document.getElementById('statusLocal').innerHTML = `💾 Mode Local • ${users.length} user dari users.js`;
             } else {
                 console.warn('USERS_DATA not found, using default');
                 adminCode = 'admin123';
                 users = [
                     { id: 1, username: 'admin', email: 'admin@digical.com', status: 'approved', isAdmin: true, createdAt: new Date().toISOString().split('T')[0] }
                 ];
+                document.getElementById('statusLocal').innerHTML = `⚠️ users.js tidak ditemukan, menggunakan default`;
             }
             
-            // Simpan ke localStorage untuk sementara (agar edit tidak hilang saat refresh)
-            loadFromLocalStorage();
-        }
-        
-        function loadFromLocalStorage() {
+            // Load perubahan sementara dari localStorage (jika ada)
             const savedUsers = localStorage.getItem('digical_users_temp');
             if (savedUsers) {
-                users = JSON.parse(savedUsers);
-                console.log('📦 Loaded from localStorage');
-            } else {
-                // Backup ke localStorage
-                localStorage.setItem('digical_users_temp', JSON.stringify(users));
-                localStorage.setItem('digical_admin_code_temp', adminCode);
+                const tempUsers = JSON.parse(savedUsers);
+                if (tempUsers.length > 0) {
+                    users = tempUsers;
+                    console.log('📦 Loaded from localStorage (temporary changes)');
+                    document.getElementById('statusLocal').innerHTML = `💾 Mode Local • ${users.length} user (dengan perubahan sementara)`;
+                }
             }
         }
         
         function saveToLocalStorage() {
             localStorage.setItem('digical_users_temp', JSON.stringify(users));
-            localStorage.setItem('digical_admin_code_temp', adminCode);
         }
         
         // ========== UTILITY ==========
@@ -642,7 +653,7 @@
             renderUserList();
         }
         
-        // ========== USER MANAGEMENT (Temporary - LocalStorage) ==========
+        // ========== USER MANAGEMENT ==========
         function changeStatus(userId, newStatus) {
             const user = users.find(u => u.id === userId);
             if (user) {
@@ -650,8 +661,6 @@
                 saveToLocalStorage();
                 renderDashboard();
                 showMessage(`✅ Status user "${user.username}" diubah menjadi ${newStatus}`, 'success');
-                
-                // Tampilkan instruksi untuk simpan permanen
                 showPermanentSaveHint();
             }
         }
@@ -709,7 +718,8 @@
                 }
             } else {
                 // Add new
-                const newId = Math.max(...users.map(u => u.id), 0) + 1;
+                const maxId = users.length > 0 ? Math.max(...users.map(u => u.id)) : 0;
+                const newId = maxId + 1;
                 users.push({
                     id: newId,
                     username: username,
@@ -734,36 +744,46 @@
         
         function showPermanentSaveHint() {
             // Tampilkan notifikasi untuk save permanen ke users.js
+            const existingHint = document.querySelector('.permanent-hint');
+            if (existingHint) existingHint.remove();
+            
+            const nonAdminUsers = users.filter(u => !u.isAdmin);
+            const exportData = {
+                adminCode: adminCode,
+                users: nonAdminUsers
+            };
+            
             const hint = document.createElement('div');
-            hint.className = 'message info';
+            hint.className = 'permanent-hint';
             hint.style.position = 'fixed';
             hint.style.bottom = '20px';
             hint.style.right = '20px';
-            hint.style.maxWidth = '350px';
+            hint.style.maxWidth = '400px';
             hint.style.zIndex = '999';
             hint.style.background = '#fff3cd';
             hint.style.color = '#856404';
             hint.style.borderLeft = '4px solid #ffc107';
+            hint.style.borderRadius = '8px';
+            hint.style.padding = '15px';
+            hint.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            hint.style.fontSize = '12px';
             hint.innerHTML = `
-                <strong>📝 Perubahan sementara!</strong><br>
-                Edit sudah tersimpan di browser. Agar permanen, copy data di bawah ke file <code>users.js</code>:
-                <pre style="font-size: 10px; background: white; padding: 8px; margin-top: 8px; border-radius: 5px; overflow-x: auto;">${JSON.stringify({ adminCode: adminCode, users: users.filter(u => !u.isAdmin) }, null, 2)}</pre>
-                <button onclick="this.parentElement.remove()" style="margin-top: 8px; padding: 4px 12px; background: #ffc107; color: #333;">Tutup</button>
+                <strong>📝 Perubahan bersifat sementara!</strong><br>
+                Edit sudah tersimpan di browser. Agar permanen, copy kode di bawah dan paste ke file <code>users.js</code>:
+                <pre style="font-size: 10px; background: #f8f9fa; padding: 10px; margin-top: 10px; border-radius: 5px; overflow-x: auto; max-height: 200px;">${JSON.stringify(exportData, null, 2)}</pre>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button onclick="copyToClipboard('${encodeURIComponent(JSON.stringify(exportData, null, 2))}')" style="padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">📋 Copy</button>
+                    <button onclick="this.parentElement.parentElement.remove()" style="padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Tutup</button>
+                </div>
             `;
             document.body.appendChild(hint);
-            
-            setTimeout(() => {
-                if (hint.parentElement) hint.remove();
-            }, 15000);
         }
         
-        // ========== EXPORT FUNCTION (Copy to Clipboard) ==========
-        function getPermanentData() {
-            const exportData = {
-                adminCode: adminCode,
-                users: users.filter(u => !u.isAdmin)
-            };
-            return JSON.stringify(exportData, null, 2);
+        function copyToClipboard(encodedText) {
+            const text = decodeURIComponent(encodedText);
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage('✅ Kode berhasil disalin! Paste ke file users.js', 'success');
+            });
         }
         
         // ========== INIT ==========
