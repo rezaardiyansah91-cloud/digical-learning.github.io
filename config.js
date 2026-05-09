@@ -2,7 +2,7 @@
 // PERINGATAN: Token ini sudah kadaluarsa/terekspos. Ganti dengan token baru Anda!
 const GITHUB_CONFIG = {
     // GANTI DENGAN TOKEN BARU ANDA - Token di bawah sudah tidak aman
-    TOKEN: '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',
+    TOKEN: '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',
     
     // Ganti dengan username GitHub Anda
     OWNER: 'rezaardiyansah91-cloud',
