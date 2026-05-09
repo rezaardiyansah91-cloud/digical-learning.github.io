@@ -1,8 +1,8 @@
 // users.js - Edit file ini untuk mengelola user
-// Password disimpan dalam bentuk SHA-256 hash
+// Password ditulis langsung (plain text) - hanya Anda yang akses file ini
 
 const USERS_DATA = {
-    // Kode admin untuk login ke panel admin (bisa diubah)
+    // Kode admin untuk login ke panel admin
     adminCode: "admin123",
     
     // Daftar user
@@ -11,18 +11,16 @@ const USERS_DATA = {
             id: 1,
             username: "admin",
             email: "admin@digical.com",
-            // password: "admin123" -> hash SHA-256
-            passwordHash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+            password: "admin123",        // password plain text
             status: "approved",
             isAdmin: true,
             createdAt: "2026-05-09"
         },
         {
             id: 2,
-            username: "rezaardiyansah",
+            username: "rezaardiYansah",
             email: "rezaardiYansah91@gmail.com",
-            // password: "reza123" -> hash SHA-256
-            passwordHash: "7b3d979ca8330a94fa7e9e1e46625d9fdba40e2c597dee00309d46bc345c9dd6",
+            password: "reza123",
             status: "approved",
             isAdmin: false,
             createdAt: "2026-05-09"
@@ -31,8 +29,7 @@ const USERS_DATA = {
             id: 3,
             username: "abdulaziz",
             email: "abdulaziz@example.com",
-            // password: "kAlimalang21" -> hash SHA-256
-            passwordHash: "0a5b4b9c8e4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c",
+            password: "kAlimalang21",         // ganti sesuai keinginan
             status: "approved",
             isAdmin: false,
             createdAt: "2026-05-09"
@@ -41,7 +38,7 @@ const USERS_DATA = {
             id: 4,
             username: "user1",
             email: "user1@example.com",
-            passwordHash: "e5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c",
+            password: "user1123",
             status: "suspended",
             isAdmin: false,
             createdAt: "2026-05-08"
@@ -50,7 +47,7 @@ const USERS_DATA = {
             id: 5,
             username: "budi",
             email: "budi@example.com",
-            passwordHash: "f4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5c5b9a8e4b5",
+            password: "budi123",
             status: "approved",
             isAdmin: false,
             createdAt: "2026-05-07"
