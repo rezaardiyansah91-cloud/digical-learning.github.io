@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digical IDE</title>
+    <title>Digical IDE - Platform Komputasi & Desain Teknik</title>
     <style>
         * {
             margin: 0;
@@ -127,8 +127,8 @@
             <a href="login.html" class="menu-btn">
                 <span>🔐</span> Login / Register
             </a>
-            <a href="filemanager.html" class="menu-btn secondary">
-                <span>📁</span> File Manager
+            <a href="app.html" class="menu-btn secondary">
+                <span>🚀</span> Buka Digical IDE
             </a>
         </div>
         
@@ -139,26 +139,41 @@
             • Kode admin: <code>admin123</code>
         </div>
         
-        <div class="status">
-            ✅ Sistem Siap Digunakan
+        <div class="status" id="statusDisplay">
+            🔍 Memeriksa status login...
         </div>
     </div>
     
     <script>
         // Cek apakah user sudah login
         const savedUser = localStorage.getItem('digical_current_user');
+        const statusDiv = document.getElementById('statusDisplay');
+        
         if (savedUser) {
             try {
                 const user = JSON.parse(savedUser);
-                const menuDiv = document.querySelector('.menu');
-                const statusDiv = document.querySelector('.status');
-                
                 if (user.status === 'approved') {
-                    statusDiv.innerHTML = `✅ Login sebagai: <strong>${user.username}</strong>`;
+                    statusDiv.innerHTML = `✅ Login sebagai: <strong>${user.username}</strong> | <a href="app.html" style="color: #155724;">Langsung buka IDE →</a>`;
                     statusDiv.style.background = '#cce5ff';
                     statusDiv.style.color = '#004085';
+                } else if (user.status === 'pending') {
+                    statusDiv.innerHTML = `⏳ Akun <strong>${user.username}</strong> menunggu approval admin`;
+                    statusDiv.style.background = '#fff3cd';
+                    statusDiv.style.color = '#856404';
+                } else {
+                    statusDiv.innerHTML = `⚠️ Akun <strong>${user.username}</strong> dinonaktifkan. Hubungi admin.`;
+                    statusDiv.style.background = '#f8d7da';
+                    statusDiv.style.color = '#721c24';
                 }
-            } catch(e) {}
+            } catch(e) {
+                statusDiv.innerHTML = `❌ Silakan login untuk mengakses Digical IDE`;
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+            }
+        } else {
+            statusDiv.innerHTML = `❌ Belum login. Silakan login terlebih dahulu.`;
+            statusDiv.style.background = '#f8d7da';
+            statusDiv.style.color = '#721c24';
         }
     </script>
 </body>
