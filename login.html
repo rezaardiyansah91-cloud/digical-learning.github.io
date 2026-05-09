@@ -3,108 +3,760 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Digical IDE</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Digical IDE - Login</title>
     <style>
-        .approval-info { background: #e8f4fd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4285f4;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #5f6368;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #3c4043;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(66, 133, 244, 0.4);
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .message.error {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #c33;
+            display: block;
+        }
+        
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+            display: block;
+        }
+        
+        .message.info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #1565c0;
+            display: block;
+        }
+        
+        .links {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .links a {
+            color: #4285f4;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+        
+        .admin-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #e8f0fe;
+            color: #4285f4;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container auth-container">
-        <h1>Login Digical IDE</h1>
+    <div class="container" id="app">
+        <h1>🚀 Digical IDE</h1>
+        <div class="subtitle">Platform Komputasi & Desain Teknik</div>
         
-        <div id="message"></div>
+        <div id="message" class="message"></div>
         
-        <div class="approval-info">
-            <strong>⚠️ Informasi:</strong> Semua akun membutuhkan approval admin sebelum dapat login.
-            Proses approval memakan waktu maksimal 1x24 jam.
+        <!-- Login Form -->
+        <div id="loginForm">
+            <div class="form-group">
+                <label>👤 Username atau Email</label>
+                <input type="text" id="loginUsername" placeholder="Masukkan username atau email">
+            </div>
+            <button onclick="handleLogin()">Login ke Digical IDE</button>
+            
+            <div class="links">
+                <a href="#" onclick="showRegister()">Belum punya akun? Register</a>
+                <a href="#" onclick="showAdminPanel()">🔐 Admin Panel</a>
+            </div>
+            
+            <div class="admin-info">
+                <strong>💡 Informasi:</strong> Sistem tanpa password. Login dengan username yang sudah terdaftar.
+                Admin dapat mengelola user di panel admin.
+            </div>
         </div>
         
-        <form id="loginForm">
+        <!-- Register Form -->
+        <div id="registerForm" style="display: none;">
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" required>
+                <label>👤 Username</label>
+                <input type="text" id="regUsername" placeholder="Nama pengguna">
+            </div>
+            <div class="form-group">
+                <label>📧 Email</label>
+                <input type="email" id="regEmail" placeholder="Email aktif">
+            </div>
+            <button onclick="handleRegister()">Daftar & Minta Approval</button>
+            
+            <div class="links">
+                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
+            </div>
+            
+            <div class="admin-info">
+                <strong>⚠️ Perhatian:</strong> Pendaftaran membutuhkan approval admin.
+                Setelah mendaftar, hubungi admin untuk aktivasi akun.
+            </div>
+        </div>
+        
+        <!-- Admin Panel -->
+        <div id="adminPanel" style="display: none;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+                <h3 style="color: white;">🔐 Admin Panel</h3>
+                <p style="font-size: 12px; opacity: 0.9;">Kelola user & approval</p>
             </div>
             
             <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" required>
+                <label>🔑 Kode Admin</label>
+                <input type="password" id="adminCode" placeholder="Masukkan kode admin" value="admin123">
+            </div>
+            <button onclick="loginAdmin()">Login sebagai Admin</button>
+            
+            <div class="links">
+                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
             </div>
             
-            <button type="submit">Login</button>
-        </form>
-        
-        <div class="links">
-            <a href="register.html">Belum punya akun? Register</a>
+            <div class="admin-info">
+                <strong>🔧 Kode Admin Default:</strong> <code>admin123</code><br>
+                <small>Ganti kode di file HTML untuk keamanan</small>
+            </div>
         </div>
         
-        <div style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
-            <strong>Butuh bantuan?</strong><br>
-            Hubungi admin: <strong>abdulaziz.ir@gmail.com</strong>
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="color: #4285f4;">📊 Manajemen User</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="logoutAdmin()" style="width: auto; padding: 8px 15px; background: #5f6368;">Logout</button>
+                </div>
+            </div>
+            
+            <div id="adminStats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;"></div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                <input type="text" id="searchUser" placeholder="🔍 Cari user..." style="flex: 1;" onkeyup="filterUsers()">
+                <select id="filterStatus" onchange="filterUsers()" style="width: auto;">
+                    <option value="all">Semua</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+            </div>
+            
+            <div id="userList" style="max-height: 400px; overflow-y: auto;"></div>
+            
+            <div class="links">
+                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
+            </div>
+        </div>
+        
+        <!-- Main App (Redirect ke Digical IDE) -->
+        <div id="mainApp" style="display: none; text-align: center;">
+            <div style="margin-bottom: 20px;">
+                <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #4285f4; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto;"></div>
+                <h3>🚀 Mengalihkan ke Digical IDE...</h3>
+                <p id="welcomeUser" style="color: #5f6368; margin-top: 10px;"></p>
+            </div>
+            <button onclick="openDigicalIDE()" style="width: auto; padding: 12px 30px; background: linear-gradient(135deg, #4285f4, #34a853);">
+                <i>🚀</i> Buka Digical IDE
+            </button>
+            <button onclick="logout()" style="width: auto; padding: 12px 30px; background: #5f6368; margin-top: 10px;">
+                Logout
+            </button>
         </div>
     </div>
     
-    <script type="module">
-        import { auth, db } from './firebase-config.js';
-        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         
-        const form = document.getElementById('loginForm');
-        const messageDiv = document.getElementById('message');
+        .user-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            transition: all 0.3s;
+            border: 1px solid #e0e0e0;
+        }
         
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        .user-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #202124;
+        }
+        
+        .user-email {
+            font-size: 12px;
+            color: #5f6368;
+        }
+        
+        .user-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-suspended { background: #f8d7da; color: #721c24; }
+        
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .user-actions button {
+            width: auto;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .btn-approve { background: #28a745; }
+        .btn-suspend { background: #ffc107; color: #333; }
+        .btn-delete { background: #dc3545; }
+        .btn-reactivate { background: #17a2b8; }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+    </style>
+    
+    <script>
+        // Konfigurasi
+        const ADMIN_CODE = 'admin123'; // Ganti dengan kode rahasia Anda
+        
+        // Data users disimpan di localStorage
+        let users = [];
+        let currentUser = null;
+        let isAdminLoggedIn = false;
+        
+        // Inisialisasi data default
+        function initData() {
+            const savedUsers = localStorage.getItem('digical_users');
+            if (savedUsers) {
+                users = JSON.parse(savedUsers);
+            } else {
+                // Data default
+                users = [
+                    {
+                        id: 1,
+                        username: 'admin',
+                        email: 'admin@digical.com',
+                        status: 'approved',
+                        createdAt: new Date().toISOString(),
+                        isAdmin: true
+                    },
+                    {
+                        id: 2,
+                        username: 'user1',
+                        email: 'user1@example.com',
+                        status: 'approved',
+                        createdAt: new Date().toISOString(),
+                        isAdmin: false
+                    },
+                    {
+                        id: 3,
+                        username: 'testuser',
+                        email: 'test@example.com',
+                        status: 'pending',
+                        createdAt: new Date().toISOString(),
+                        isAdmin: false
+                    }
+                ];
+                saveUsers();
+            }
+        }
+        
+        function saveUsers() {
+            localStorage.setItem('digical_users', JSON.stringify(users));
+        }
+        
+        // Tampilkan pesan
+        function showMessage(msg, type = 'error') {
+            const msgDiv = document.getElementById('message');
+            msgDiv.textContent = msg;
+            msgDiv.className = `message ${type}`;
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            setTimeout(() => {
+                msgDiv.className = 'message';
+                msgDiv.textContent = '';
+            }, 4000);
+        }
+        
+        // Login handler
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
             
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
-                // Ambil data dari Firestore
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                const userData = userDoc.data();
-                
-                if (!userData) {
-                    showMessage('Data user tidak ditemukan!', 'error');
-                    return;
-                }
-                
-                // Cek status approval
-                if (userData.status === 'pending') {
-                    showMessage('Akun Anda masih menunggu approval dari admin.<br>Silakan hubungi admin: <strong>abdulaziz.ir@gmail.com</strong>', 'error');
-                    await auth.signOut();
-                } else if (userData.status === 'rejected') {
-                    showMessage('Akun Anda ditolak oleh admin. Hubungi admin untuk info lebih lanjut.', 'error');
-                    await auth.signOut();
-                } else if (userData.status === 'suspended') {
-                    showMessage('Akun Anda sedang dinonaktifkan. Hubungi admin.', 'error');
-                    await auth.signOut();
-                } else {
-                    // Approved - simpan ke session/localStorage
-                    localStorage.setItem('user', JSON.stringify({
-                        uid: user.uid,
-                        email: user.email,
-                        fullName: userData.fullName,
-                        username: userData.username,
-                        role: userData.role
-                    }));
-                    window.location.href = 'dashboard.html';
-                }
-                
-            } catch (error) {
-                console.error(error);
-                if (error.code === 'auth/invalid-credential') {
-                    showMessage('Email atau password salah!', 'error');
-                } else {
-                    showMessage('Login gagal: ' + error.message, 'error');
+            if (!username) {
+                showMessage('Masukkan username atau email!', 'error');
+                return;
+            }
+            
+            // Cari user
+            const user = users.find(u => 
+                u.username.toLowerCase() === username.toLowerCase() || 
+                u.email.toLowerCase() === username.toLowerCase()
+            );
+            
+            if (!user) {
+                showMessage('Username/email tidak terdaftar! Silakan register terlebih dahulu.', 'error');
+                return;
+            }
+            
+            if (user.status === 'pending') {
+                showMessage('Akun Anda masih menunggu approval admin. Silakan hubungi admin untuk aktivasi.', 'error');
+                return;
+            }
+            
+            if (user.status === 'suspended') {
+                showMessage('Akun Anda telah dinonaktifkan. Hubungi admin untuk informasi lebih lanjut.', 'error');
+                return;
+            }
+            
+            // Login berhasil
+            currentUser = user;
+            localStorage.setItem('digical_current_user', JSON.stringify(user));
+            showMainApp();
+        }
+        
+        // Register handler
+        function handleRegister() {
+            const username = document.getElementById('regUsername').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            
+            if (!username) {
+                showMessage('Username harus diisi!', 'error');
+                return;
+            }
+            
+            if (!email || !email.includes('@')) {
+                showMessage('Email tidak valid!', 'error');
+                return;
+            }
+            
+            // Cek duplikat
+            const existing = users.find(u => 
+                u.username.toLowerCase() === username.toLowerCase() || 
+                u.email.toLowerCase() === email.toLowerCase()
+            );
+            
+            if (existing) {
+                showMessage('Username atau email sudah terdaftar!', 'error');
+                return;
+            }
+            
+            // Buat user baru
+            const newUser = {
+                id: Date.now(),
+                username: username,
+                email: email,
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                isAdmin: false
+            };
+            
+            users.push(newUser);
+            saveUsers();
+            
+            showMessage(`✅ Pendaftaran berhasil! Akun "${username}" menunggu approval admin.`, 'success');
+            
+            // Reset form dan kembali ke login
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regEmail').value = '';
+            showLogin();
+        }
+        
+        // Admin login
+        function loginAdmin() {
+            const code = document.getElementById('adminCode').value;
+            
+            if (code !== ADMIN_CODE) {
+                showMessage('Kode admin salah!', 'error');
+                return;
+            }
+            
+            isAdminLoggedIn = true;
+            showAdminDashboard();
+        }
+        
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            showLogin();
+        }
+        
+        function showAdminDashboard() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            
+            renderAdminDashboard();
+        }
+        
+        function renderAdminDashboard() {
+            // Stats
+            const pendingCount = users.filter(u => u.status === 'pending' && !u.isAdmin).length;
+            const approvedCount = users.filter(u => u.status === 'approved' && !u.isAdmin).length;
+            const suspendedCount = users.filter(u => u.status === 'suspended' && !u.isAdmin).length;
+            
+            document.getElementById('adminStats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${pendingCount}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${approvedCount}</div>
+                    <div class="stat-label">Aktif</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${suspendedCount}</div>
+                    <div class="stat-label">Suspended</div>
+                </div>
+            `;
+            
+            renderUserList();
+        }
+        
+        function renderUserList() {
+            const searchTerm = document.getElementById('searchUser')?.value.toLowerCase() || '';
+            const filterStatus = document.getElementById('filterStatus')?.value || 'all';
+            
+            let filtered = users.filter(u => !u.isAdmin);
+            
+            if (searchTerm) {
+                filtered = filtered.filter(u => 
+                    u.username.toLowerCase().includes(searchTerm) || 
+                    u.email.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (filterStatus !== 'all') {
+                filtered = filtered.filter(u => u.status === filterStatus);
+            }
+            
+            if (filtered.length === 0) {
+                document.getElementById('userList').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #5f6368;">
+                        <i>📭</i>
+                        <p>Tidak ada user</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            document.getElementById('userList').innerHTML = filtered.map(user => `
+                <div class="user-card" data-user-id="${user.id}">
+                    <div class="user-info">
+                        <div>
+                            <span class="user-name">${escapeHtml(user.username)}</span>
+                            <span class="user-status status-${user.status}">${user.status.toUpperCase()}</span>
+                        </div>
+                        <div class="user-email">${escapeHtml(user.email)}</div>
+                        <div style="font-size: 11px; color: #999; margin-top: 4px;">
+                            📅 ${new Date(user.createdAt).toLocaleDateString('id-ID')}
+                        </div>
+                    </div>
+                    <div class="user-actions">
+                        ${user.status === 'pending' ? `
+                            <button class="btn-approve" onclick="approveUser(${user.id})">✅ Approve</button>
+                        ` : ''}
+                        ${user.status === 'approved' ? `
+                            <button class="btn-suspend" onclick="suspendUser(${user.id})">⏸️ Suspend</button>
+                        ` : ''}
+                        ${user.status === 'suspended' ? `
+                            <button class="btn-reactivate" onclick="reactivateUser(${user.id})">🔄 Aktifkan</button>
+                        ` : ''}
+                        <button class="btn-delete" onclick="deleteUser(${user.id})">🗑️ Hapus</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function filterUsers() {
+            renderUserList();
+        }
+        
+        function approveUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.status = 'approved';
+                saveUsers();
+                showMessage(`✅ User "${user.username}" telah diapprove!`, 'success');
+                renderAdminDashboard();
+            }
+        }
+        
+        function suspendUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user && confirm(`Non-aktifkan user "${user.username}"?`)) {
+                user.status = 'suspended';
+                saveUsers();
+                showMessage(`⏸️ User "${user.username}" telah dinonaktifkan.`, 'success');
+                renderAdminDashboard();
+            }
+        }
+        
+        function reactivateUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.status = 'approved';
+                saveUsers();
+                showMessage(`✅ User "${user.username}" telah diaktifkan kembali.`, 'success');
+                renderAdminDashboard();
+            }
+        }
+        
+        function deleteUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user && confirm(`HAPUS PERMANEN user "${user.username}"?\n\n⚠️ Tindakan ini tidak dapat dibatalkan!`)) {
+                users = users.filter(u => u.id !== userId);
+                saveUsers();
+                showMessage(`🗑️ User "${user.username}" telah dihapus.`, 'success');
+                renderAdminDashboard();
+            }
+        }
+        
+        // UI Navigation
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('message').className = 'message';
+            document.getElementById('message').textContent = '';
+            document.getElementById('loginUsername').value = '';
+        }
+        
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+        
+        function showAdminPanel() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('adminCode').value = '';
+        }
+        
+        function showMainApp() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            document.getElementById('welcomeUser').innerHTML = `Selamat datang, <strong>${escapeHtml(currentUser?.username || '')}</strong>!`;
+        }
+        
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('digical_current_user');
+            showLogin();
+        }
+        
+        function openDigicalIDE() {
+            // Buka link Digical IDE
+            window.open('https://intergyral-amatively-january.ngrok-free.dev/', '_blank');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Cek session yang tersimpan
+        function checkSavedSession() {
+            const savedUser = localStorage.getItem('digical_current_user');
+            if (savedUser) {
+                try {
+                    const user = JSON.parse(savedUser);
+                    // Verifikasi user masih ada dan aktif
+                    const existingUser = users.find(u => u.id === user.id);
+                    if (existingUser && existingUser.status === 'approved') {
+                        currentUser = existingUser;
+                        showMainApp();
+                        return true;
+                    } else {
+                        localStorage.removeItem('digical_current_user');
+                    }
+                } catch(e) {
+                    localStorage.removeItem('digical_current_user');
                 }
             }
-        });
+            return false;
+        }
         
-        function showMessage(msg, type) {
-            messageDiv.innerHTML = `<div class="message ${type}">${msg}</div>`;
+        // Inisialisasi
+        initData();
+        if (!checkSavedSession()) {
+            showLogin();
         }
     </script>
 </body>
