@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digical IDE - Login & Registrasi</title>
+    <title>Digical IDE - Login</title>
     <style>
         * {
             margin: 0;
@@ -25,28 +25,21 @@
             background: white;
             border-radius: 20px;
             padding: 40px;
-            max-width: 500px;
+            max-width: 700px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: fadeInUp 0.5s ease-out;
         }
         
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         h1 {
             text-align: center;
             color: #4285f4;
             margin-bottom: 10px;
-            font-size: 1.8em;
         }
         
         .subtitle {
@@ -67,7 +60,7 @@
             font-weight: 500;
         }
         
-        input, select {
+        input {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
@@ -76,7 +69,7 @@
             transition: all 0.3s;
         }
         
-        input:focus, select:focus {
+        input:focus {
             outline: none;
             border-color: #4285f4;
             box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
@@ -106,6 +99,10 @@
             background: linear-gradient(135deg, #6c757d, #5a6268);
         }
         
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+        
         .message {
             padding: 12px;
             border-radius: 10px;
@@ -128,10 +125,10 @@
             display: block;
         }
         
-        .message.info {
-            background: #e3f2fd;
-            color: #1565c0;
-            border-left: 4px solid #1565c0;
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #856404;
             display: block;
         }
         
@@ -147,36 +144,27 @@
             text-decoration: none;
             margin: 0 10px;
             font-size: 14px;
+            cursor: pointer;
         }
         
         .links a:hover {
             text-decoration: underline;
         }
         
-        .admin-info {
-            background: #f8f9fa;
+        .info-box {
+            background: #e8f0fe;
             padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
             font-size: 12px;
-            color: #666;
+            color: #1a73e8;
             text-align: center;
         }
         
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            background: #e8f0fe;
-            color: #4285f4;
-            border-radius: 20px;
-            font-size: 11px;
-            margin-left: 8px;
-        }
-        
-        /* Admin Dashboard Styles */
+        /* Admin Dashboard */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
@@ -209,13 +197,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-            transition: all 0.3s;
             border: 1px solid #e0e0e0;
-        }
-        
-        .user-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .user-info {
@@ -241,8 +223,8 @@
             margin-left: 10px;
         }
         
-        .status-pending { background: #fff3cd; color: #856404; }
         .status-approved { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
         .status-suspended { background: #f8d7da; color: #721c24; }
         
         .user-actions {
@@ -258,51 +240,82 @@
             margin: 0;
         }
         
-        .btn-approve { background: #28a745; }
-        .btn-suspend { background: #ffc107; color: #333; }
-        .btn-delete { background: #dc3545; }
-        .btn-reactivate { background: #17a2b8; }
-        .btn-export { background: #6c757d; }
-        
         .filter-bar {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin: 20px 0;
             flex-wrap: wrap;
         }
         
         .filter-bar input, .filter-bar select {
             flex: 1;
-            min-width: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
         }
         
         .user-list {
-            max-height: 500px;
+            max-height: 400px;
             overflow-y: auto;
         }
         
-        .back-btn {
-            background: #6c757d;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 450px;
+            width: 90%;
+        }
+        
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #4285f4;
+        }
+        
+        .modal-content .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
             margin-top: 20px;
         }
         
+        .edit-hint {
+            background: #fff3cd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .edit-hint code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
         @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            .stats-grid {
-                gap: 8px;
-            }
-            .stat-number {
-                font-size: 20px;
-            }
-            .user-card {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .user-actions {
-                justify-content: center;
-            }
+            .container { padding: 20px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .user-card { flex-direction: column; align-items: stretch; }
+            .user-actions { justify-content: center; }
         }
     </style>
 </head>
@@ -322,42 +335,21 @@
             <button onclick="handleLogin()">🔐 Login ke Digical IDE</button>
             
             <div class="links">
-                <a href="#" onclick="showRegister()">📝 Belum punya akun? Register</a>
-                <a href="#" onclick="showAdminPanel()">🔑 Admin Panel</a>
+                <a onclick="showAdminPanel()">🔑 Admin Panel</a>
                 <a href="index.html">🏠 Home</a>
             </div>
             
-            <div class="admin-info">
-                <strong>💡 Informasi:</strong> Sistem tanpa password. Login dengan username/email yang sudah terdaftar dan di-approve admin.
+            <div class="info-box">
+                <strong>💡 Informasi:</strong> Akun dibuat dan dikelola langsung oleh admin melalui file users.js.
+                Hubungi admin untuk pendaftaran akun baru.
             </div>
         </div>
         
-        <!-- ========== REGISTER FORM ========== -->
-        <div id="registerForm" style="display: none;">
-            <div class="form-group">
-                <label>👤 Username</label>
-                <input type="text" id="regUsername" placeholder="Nama pengguna">
-            </div>
-            <div class="form-group">
-                <label>📧 Email</label>
-                <input type="email" id="regEmail" placeholder="Email aktif">
-            </div>
-            <button onclick="handleRegister()">📝 Daftar & Minta Approval</button>
-            
-            <div class="links">
-                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
-            </div>
-            
-            <div class="admin-info">
-                <strong>⚠️ Perhatian:</strong> Pendaftaran membutuhkan approval admin. Hubungi admin setelah mendaftar.
-            </div>
-        </div>
-        
-        <!-- ========== ADMIN LOGIN PANEL ========== -->
+        <!-- ========== ADMIN LOGIN ========== -->
         <div id="adminPanel" style="display: none;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
                 <h3 style="color: white;">🔐 Admin Panel</h3>
-                <p style="font-size: 12px; opacity: 0.9;">Kelola user & approval</p>
+                <p style="font-size: 12px;">Masukkan kode admin untuk mengelola user</p>
             </div>
             
             <div class="form-group">
@@ -367,12 +359,12 @@
             <button onclick="loginAdmin()">Login sebagai Admin</button>
             
             <div class="links">
-                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
+                <a onclick="showLogin()">← Kembali ke Login</a>
             </div>
             
-            <div class="admin-info">
+            <div class="info-box">
                 <strong>🔧 Kode Admin Default:</strong> <code>admin123</code><br>
-                <small>Ganti kode di file JavaScript untuk keamanan</small>
+                <small>Ganti kode di file users.js</small>
             </div>
         </div>
         
@@ -381,10 +373,14 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                 <h3 style="color: #4285f4;">📊 Manajemen User</h3>
                 <div style="display: flex; gap: 10px;">
-                    <button onclick="exportUserData()" class="btn-export" style="width: auto; background: #17a2b8;">💾 Export Data</button>
-                    <button onclick="showImportDialog()" class="btn-export" style="width: auto; background: #6c757d;">📥 Import Data</button>
-                    <button onclick="logoutAdmin()" style="width: auto; background: #dc3545;">Logout</button>
+                    <button onclick="showAddUserModal()" style="width: auto; background: #28a745; padding: 8px 15px;">➕ Tambah User</button>
+                    <button onclick="logoutAdmin()" style="width: auto; background: #dc3545; padding: 8px 15px;">Logout</button>
                 </div>
+            </div>
+            
+            <div class="edit-hint">
+                <strong>📝 Cara Edit Manual:</strong> User bisa diedit langsung di file <code>users.js</code>. 
+                Setelah mengedit file, refresh halaman ini.
             </div>
             
             <div id="adminStats" class="stats-grid"></div>
@@ -393,215 +389,203 @@
                 <input type="text" id="searchUser" placeholder="🔍 Cari user..." onkeyup="filterUsers()">
                 <select id="filterStatus" onchange="filterUsers()">
                     <option value="all">Semua Status</option>
-                    <option value="pending">⏳ Pending</option>
                     <option value="approved">✅ Approved</option>
+                    <option value="pending">⏳ Pending</option>
                     <option value="suspended">⏸️ Suspended</option>
                 </select>
             </div>
             
             <div id="userList" class="user-list"></div>
             
-            <button onclick="showLogin()" class="back-btn">← Kembali ke Login</button>
+            <button onclick="showLogin()" class="btn-secondary" style="margin-top: 20px;">← Kembali ke Login</button>
+        </div>
+        
+        <!-- ========== ADD/EDIT USER MODAL ========== -->
+        <div id="userModal" class="modal">
+            <div class="modal-content">
+                <h3 id="modalTitle">➕ Tambah User Baru</h3>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="modalUsername" placeholder="Nama pengguna">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="modalEmail" placeholder="Email">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="modalStatus">
+                        <option value="approved">✅ Approved</option>
+                        <option value="pending">⏳ Pending</option>
+                        <option value="suspended">⏸️ Suspended</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="saveUserFromModal()" style="flex: 1;">💾 Simpan</button>
+                    <button onclick="closeModal()" style="flex: 1; background: #6c757d;">Batal</button>
+                </div>
+                <div class="info-box" style="margin-top: 15px; font-size: 11px;">
+                    <strong>ℹ️ Catatan:</strong> Perubahan akan disimpan ke localStorage sementara. 
+                    Untuk permanen, copy data dan paste ke file users.js
+                </div>
+            </div>
         </div>
     </div>
     
+    <!-- Load data user dari users.js -->
+    <script src="users.js"></script>
+    
     <script>
-        // ========== KONFIGURASI ==========
-        const ADMIN_CODE = 'admin123'; // Ganti dengan kode admin Anda
-        
-        // ========== DATA USER (LocalStorage) ==========
+        // ========== GLOBAL VARIABLES ==========
         let users = [];
-        let currentAdminLoggedIn = false;
+        let adminCode = 'admin123';
+        let editingUserId = null;
         
-        // Inisialisasi data
+        // ========== INITIALIZATION ==========
         function initData() {
-            const savedUsers = localStorage.getItem('digical_users');
+            // Load dari USERS_DATA yang didefinisikan di users.js
+            if (typeof USERS_DATA !== 'undefined') {
+                users = JSON.parse(JSON.stringify(USERS_DATA.users)); // Deep copy
+                adminCode = USERS_DATA.adminCode;
+                console.log('✅ Data loaded from users.js:', users.length, 'users');
+            } else {
+                console.warn('USERS_DATA not found, using default');
+                adminCode = 'admin123';
+                users = [
+                    { id: 1, username: 'admin', email: 'admin@digical.com', status: 'approved', isAdmin: true, createdAt: new Date().toISOString().split('T')[0] }
+                ];
+            }
+            
+            // Simpan ke localStorage untuk sementara (agar edit tidak hilang saat refresh)
+            loadFromLocalStorage();
+        }
+        
+        function loadFromLocalStorage() {
+            const savedUsers = localStorage.getItem('digical_users_temp');
             if (savedUsers) {
                 users = JSON.parse(savedUsers);
+                console.log('📦 Loaded from localStorage');
             } else {
-                // Data default
-                users = [
-                    {
-                        id: 1,
-                        username: 'admin',
-                        email: 'admin@digical.com',
-                        status: 'approved',
-                        createdAt: new Date().toISOString(),
-                        isAdmin: true
-                    },
-                    {
-                        id: 2,
-                        username: 'user1',
-                        email: 'user1@example.com',
-                        status: 'approved',
-                        createdAt: new Date().toISOString(),
-                        isAdmin: false
-                    },
-                    {
-                        id: 3,
-                        username: 'testuser',
-                        email: 'test@example.com',
-                        status: 'pending',
-                        createdAt: new Date().toISOString(),
-                        isAdmin: false
-                    }
-                ];
-                saveUsers();
+                // Backup ke localStorage
+                localStorage.setItem('digical_users_temp', JSON.stringify(users));
+                localStorage.setItem('digical_admin_code_temp', adminCode);
             }
         }
         
-        function saveUsers() {
-            localStorage.setItem('digical_users', JSON.stringify(users));
+        function saveToLocalStorage() {
+            localStorage.setItem('digical_users_temp', JSON.stringify(users));
+            localStorage.setItem('digical_admin_code_temp', adminCode);
         }
         
-        // ========== UTILITY FUNCTIONS ==========
-        function showMessage(msg, type = 'error') {
+        // ========== UTILITY ==========
+        function showMessage(msg, type) {
             const msgDiv = document.getElementById('message');
             msgDiv.textContent = msg;
             msgDiv.className = `message ${type}`;
-            
             setTimeout(() => {
                 msgDiv.className = 'message';
-                msgDiv.textContent = '';
-            }, 4000);
+            }, 3000);
         }
         
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
         
-        // ========== LOGIN FUNCTIONS ==========
+        // ========== LOGIN ==========
         function handleLogin() {
-            const username = document.getElementById('loginUsername').value.trim();
+            const credential = document.getElementById('loginUsername').value.trim();
             
-            if (!username) {
+            if (!credential) {
                 showMessage('Masukkan username atau email!', 'error');
                 return;
             }
             
             const user = users.find(u => 
-                u.username.toLowerCase() === username.toLowerCase() || 
-                u.email.toLowerCase() === username.toLowerCase()
+                u.username.toLowerCase() === credential.toLowerCase() || 
+                u.email.toLowerCase() === credential.toLowerCase()
             );
             
             if (!user) {
-                showMessage('Username/email tidak terdaftar! Silakan register terlebih dahulu.', 'error');
+                showMessage('Akun tidak ditemukan! Hubungi admin untuk pendaftaran.', 'error');
                 return;
             }
             
             if (user.status === 'pending') {
-                showMessage('⏳ Akun Anda masih menunggu approval admin. Hubungi admin untuk aktivasi.', 'error');
+                showMessage('⏳ Akun masih menunggu approval admin.', 'warning');
                 return;
             }
             
             if (user.status === 'suspended') {
-                showMessage('⚠️ Akun Anda telah dinonaktifkan. Hubungi admin untuk informasi lebih lanjut.', 'error');
+                showMessage('⚠️ Akun telah dinonaktifkan. Hubungi admin.', 'error');
                 return;
             }
             
-            // Login berhasil
+            // Login sukses
             localStorage.setItem('digical_current_user', JSON.stringify(user));
-            showMessage(`✅ Selamat datang, ${user.username}! Mengalihkan...`, 'success');
+            showMessage(`✅ Selamat datang, ${user.username}!`, 'success');
             
             setTimeout(() => {
                 window.location.href = 'app.html';
-            }, 1500);
+            }, 1000);
         }
         
-        // ========== REGISTER FUNCTIONS ==========
-        function handleRegister() {
-            const username = document.getElementById('regUsername').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
-            
-            if (!username) {
-                showMessage('Username harus diisi!', 'error');
-                return;
-            }
-            
-            if (!email || !email.includes('@')) {
-                showMessage('Email tidak valid!', 'error');
-                return;
-            }
-            
-            const existing = users.find(u => 
-                u.username.toLowerCase() === username.toLowerCase() || 
-                u.email.toLowerCase() === email.toLowerCase()
-            );
-            
-            if (existing) {
-                showMessage('Username atau email sudah terdaftar!', 'error');
-                return;
-            }
-            
-            const newUser = {
-                id: Date.now(),
-                username: username,
-                email: email,
-                status: 'pending',
-                createdAt: new Date().toISOString(),
-                isAdmin: false
-            };
-            
-            users.push(newUser);
-            saveUsers();
-            
-            showMessage(`✅ Pendaftaran berhasil! Akun "${username}" menunggu approval admin.`, 'success');
-            
-            // Reset form
-            document.getElementById('regUsername').value = '';
-            document.getElementById('regEmail').value = '';
-            showLogin();
-        }
-        
-        // ========== ADMIN FUNCTIONS ==========
+        // ========== ADMIN ==========
         function loginAdmin() {
             const code = document.getElementById('adminCode').value;
             
-            if (code !== ADMIN_CODE) {
+            if (code !== adminCode) {
                 showMessage('Kode admin salah!', 'error');
                 return;
             }
             
-            currentAdminLoggedIn = true;
             showAdminDashboard();
         }
         
-        function logoutAdmin() {
-            currentAdminLoggedIn = false;
-            showLogin();
+        function showAdminPanel() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('pageSubtitle').textContent = 'Admin Login';
+            document.getElementById('adminCode').value = '';
         }
         
         function showAdminDashboard() {
             document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'block';
-            document.getElementById('pageSubtitle').textContent = 'Admin Dashboard - Kelola User';
-            
-            renderAdminDashboard();
+            document.getElementById('pageSubtitle').textContent = 'Dashboard Admin';
+            renderDashboard();
         }
         
-        function renderAdminDashboard() {
-            // Stats
-            const pendingCount = users.filter(u => u.status === 'pending' && !u.isAdmin).length;
-            const approvedCount = users.filter(u => u.status === 'approved' && !u.isAdmin).length;
-            const suspendedCount = users.filter(u => u.status === 'suspended' && !u.isAdmin).length;
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('pageSubtitle').textContent = 'Login untuk mengakses platform';
+            document.getElementById('message').className = 'message';
+            document.getElementById('loginUsername').value = '';
+        }
+        
+        function logoutAdmin() {
+            showLogin();
+        }
+        
+        // ========== RENDER DASHBOARD ==========
+        function renderDashboard() {
+            const nonAdminUsers = users.filter(u => !u.isAdmin);
+            const total = nonAdminUsers.length;
+            const approved = nonAdminUsers.filter(u => u.status === 'approved').length;
+            const pending = nonAdminUsers.filter(u => u.status === 'pending').length;
+            const suspended = nonAdminUsers.filter(u => u.status === 'suspended').length;
             
             document.getElementById('adminStats').innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-number">${users.length}</div>
-                    <div class="stat-label">Total User</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${pendingCount}</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${approvedCount}</div>
-                    <div class="stat-label">Aktif</div>
-                </div>
+                <div class="stat-card"><div class="stat-number">${total}</div><div class="stat-label">Total User</div></div>
+                <div class="stat-card"><div class="stat-number">${approved}</div><div class="stat-label">Approved</div></div>
+                <div class="stat-card"><div class="stat-number">${pending}</div><div class="stat-label">Pending</div></div>
+                <div class="stat-card"><div class="stat-number">${suspended}</div><div class="stat-label">Suspended</div></div>
             `;
             
             renderUserList();
@@ -626,37 +610,29 @@
             
             if (filtered.length === 0) {
                 document.getElementById('userList').innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #5f6368;">
-                        <i>📭</i>
-                        <p>Tidak ada user</p>
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <i>📭</i> Tidak ada user
                     </div>
                 `;
                 return;
             }
             
             document.getElementById('userList').innerHTML = filtered.map(user => `
-                <div class="user-card" data-user-id="${user.id}">
+                <div class="user-card">
                     <div class="user-info">
                         <div>
                             <span class="user-name">${escapeHtml(user.username)}</span>
                             <span class="user-status status-${user.status}">${user.status.toUpperCase()}</span>
                         </div>
                         <div class="user-email">${escapeHtml(user.email)}</div>
-                        <div style="font-size: 11px; color: #999; margin-top: 4px;">
-                            📅 ${new Date(user.createdAt).toLocaleDateString('id-ID')}
-                        </div>
+                        <div style="font-size: 11px; color: #999;">📅 ${user.createdAt || 'N/A'}</div>
                     </div>
                     <div class="user-actions">
-                        ${user.status === 'pending' ? `
-                            <button class="btn-approve" onclick="approveUser(${user.id})">✅ Approve</button>
-                        ` : ''}
-                        ${user.status === 'approved' ? `
-                            <button class="btn-suspend" onclick="suspendUser(${user.id})">⏸️ Suspend</button>
-                        ` : ''}
-                        ${user.status === 'suspended' ? `
-                            <button class="btn-reactivate" onclick="reactivateUser(${user.id})">🔄 Aktifkan</button>
-                        ` : ''}
-                        <button class="btn-delete" onclick="deleteUser(${user.id})">🗑️ Hapus</button>
+                        <button onclick="editUser(${user.id})" style="background: #17a2b8;">✏️ Edit</button>
+                        ${user.status === 'pending' ? `<button onclick="changeStatus(${user.id}, 'approved')" style="background: #28a745;">✅ Approve</button>` : ''}
+                        ${user.status === 'approved' ? `<button onclick="changeStatus(${user.id}, 'suspended')" style="background: #ffc107; color:#333;">⏸️ Suspend</button>` : ''}
+                        ${user.status === 'suspended' ? `<button onclick="changeStatus(${user.id}, 'approved')" style="background: #17a2b8;">🔄 Aktifkan</button>` : ''}
+                        <button onclick="deleteUser(${user.id})" style="background: #dc3545;">🗑️ Hapus</button>
                     </div>
                 </div>
             `).join('');
@@ -666,122 +642,138 @@
             renderUserList();
         }
         
-        function approveUser(userId) {
+        // ========== USER MANAGEMENT (Temporary - LocalStorage) ==========
+        function changeStatus(userId, newStatus) {
             const user = users.find(u => u.id === userId);
             if (user) {
-                user.status = 'approved';
-                saveUsers();
-                showMessage(`✅ User "${user.username}" telah diapprove!`, 'success');
-                renderAdminDashboard();
-            }
-        }
-        
-        function suspendUser(userId) {
-            const user = users.find(u => u.id === userId);
-            if (user && confirm(`Non-aktifkan user "${user.username}"?`)) {
-                user.status = 'suspended';
-                saveUsers();
-                showMessage(`⏸️ User "${user.username}" telah dinonaktifkan.`, 'success');
-                renderAdminDashboard();
-            }
-        }
-        
-        function reactivateUser(userId) {
-            const user = users.find(u => u.id === userId);
-            if (user) {
-                user.status = 'approved';
-                saveUsers();
-                showMessage(`✅ User "${user.username}" telah diaktifkan kembali.`, 'success');
-                renderAdminDashboard();
+                user.status = newStatus;
+                saveToLocalStorage();
+                renderDashboard();
+                showMessage(`✅ Status user "${user.username}" diubah menjadi ${newStatus}`, 'success');
+                
+                // Tampilkan instruksi untuk simpan permanen
+                showPermanentSaveHint();
             }
         }
         
         function deleteUser(userId) {
             const user = users.find(u => u.id === userId);
-            if (user && confirm(`HAPUS PERMANEN user "${user.username}"?\n\n⚠️ Tindakan ini tidak dapat dibatalkan!`)) {
+            if (user && confirm(`Hapus user "${user.username}"?`)) {
                 users = users.filter(u => u.id !== userId);
-                saveUsers();
-                showMessage(`🗑️ User "${user.username}" telah dihapus.`, 'success');
-                renderAdminDashboard();
+                saveToLocalStorage();
+                renderDashboard();
+                showMessage(`🗑️ User "${user.username}" dihapus`, 'success');
+                showPermanentSaveHint();
             }
         }
         
-        // ========== EXPORT/IMPORT DATA ==========
-        function exportUserData() {
-            const data = {
-                users: users,
-                exportDate: new Date().toISOString(),
-                version: '1.0'
+        function showAddUserModal() {
+            editingUserId = null;
+            document.getElementById('modalTitle').textContent = '➕ Tambah User Baru';
+            document.getElementById('modalUsername').value = '';
+            document.getElementById('modalEmail').value = '';
+            document.getElementById('modalStatus').value = 'pending';
+            document.getElementById('userModal').style.display = 'flex';
+        }
+        
+        function editUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                editingUserId = userId;
+                document.getElementById('modalTitle').textContent = `✏️ Edit User: ${user.username}`;
+                document.getElementById('modalUsername').value = user.username;
+                document.getElementById('modalEmail').value = user.email;
+                document.getElementById('modalStatus').value = user.status;
+                document.getElementById('userModal').style.display = 'flex';
+            }
+        }
+        
+        function saveUserFromModal() {
+            const username = document.getElementById('modalUsername').value.trim();
+            const email = document.getElementById('modalEmail').value.trim();
+            const status = document.getElementById('modalStatus').value;
+            
+            if (!username || !email) {
+                showMessage('Username dan email harus diisi!', 'error');
+                return;
+            }
+            
+            if (editingUserId) {
+                // Edit existing
+                const user = users.find(u => u.id === editingUserId);
+                if (user) {
+                    user.username = username;
+                    user.email = email;
+                    user.status = status;
+                    showMessage(`✅ User "${username}" berhasil diupdate`, 'success');
+                }
+            } else {
+                // Add new
+                const newId = Math.max(...users.map(u => u.id), 0) + 1;
+                users.push({
+                    id: newId,
+                    username: username,
+                    email: email,
+                    status: status,
+                    isAdmin: false,
+                    createdAt: new Date().toISOString().split('T')[0]
+                });
+                showMessage(`✅ User "${username}" berhasil ditambahkan`, 'success');
+            }
+            
+            saveToLocalStorage();
+            renderDashboard();
+            closeModal();
+            showPermanentSaveHint();
+        }
+        
+        function closeModal() {
+            document.getElementById('userModal').style.display = 'none';
+            editingUserId = null;
+        }
+        
+        function showPermanentSaveHint() {
+            // Tampilkan notifikasi untuk save permanen ke users.js
+            const hint = document.createElement('div');
+            hint.className = 'message info';
+            hint.style.position = 'fixed';
+            hint.style.bottom = '20px';
+            hint.style.right = '20px';
+            hint.style.maxWidth = '350px';
+            hint.style.zIndex = '999';
+            hint.style.background = '#fff3cd';
+            hint.style.color = '#856404';
+            hint.style.borderLeft = '4px solid #ffc107';
+            hint.innerHTML = `
+                <strong>📝 Perubahan sementara!</strong><br>
+                Edit sudah tersimpan di browser. Agar permanen, copy data di bawah ke file <code>users.js</code>:
+                <pre style="font-size: 10px; background: white; padding: 8px; margin-top: 8px; border-radius: 5px; overflow-x: auto;">${JSON.stringify({ adminCode: adminCode, users: users.filter(u => !u.isAdmin) }, null, 2)}</pre>
+                <button onclick="this.parentElement.remove()" style="margin-top: 8px; padding: 4px 12px; background: #ffc107; color: #333;">Tutup</button>
+            `;
+            document.body.appendChild(hint);
+            
+            setTimeout(() => {
+                if (hint.parentElement) hint.remove();
+            }, 15000);
+        }
+        
+        // ========== EXPORT FUNCTION (Copy to Clipboard) ==========
+        function getPermanentData() {
+            const exportData = {
+                adminCode: adminCode,
+                users: users.filter(u => !u.isAdmin)
             };
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `digical_users_backup_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showMessage('✅ Data user berhasil diekspor!', 'success');
+            return JSON.stringify(exportData, null, 2);
         }
         
-        function showImportDialog() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/json';
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = event => {
-                    try {
-                        const importedData = JSON.parse(event.target.result);
-                        if (importedData.users && Array.isArray(importedData.users)) {
-                            users = importedData.users;
-                            saveUsers();
-                            showMessage('✅ Data user berhasil diimpor!', 'success');
-                            renderAdminDashboard();
-                        } else {
-                            showMessage('❌ Format file tidak valid!', 'error');
-                        }
-                    } catch(err) {
-                        showMessage('❌ Gagal membaca file: ' + err.message, 'error');
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
-        
-        // ========== UI NAVIGATION ==========
-        function showLogin() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('pageSubtitle').textContent = 'Login untuk mengakses platform';
-            document.getElementById('message').className = 'message';
-            document.getElementById('message').textContent = '';
-            document.getElementById('loginUsername').value = '';
-        }
-        
-        function showRegister() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('pageSubtitle').textContent = 'Daftar akun baru';
-        }
-        
-        function showAdminPanel() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('pageSubtitle').textContent = 'Admin Login';
-            document.getElementById('adminCode').value = '';
-        }
-        
-        // ========== INITIALIZATION ==========
+        // ========== INIT ==========
         initData();
         showLogin();
+        
+        // Tutup modal dengan ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
     </script>
 </body>
 </html>
