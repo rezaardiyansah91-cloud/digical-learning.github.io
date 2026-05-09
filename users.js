@@ -11,7 +11,7 @@ const USERS_DATA = {
             id: 1,
             username: "admin",
             email: "admin@digical.com",
-            status: "approved",     // approved, pending, suspended
+            status: "approved",
             isAdmin: true,
             createdAt: "2026-05-09"
         },
@@ -26,7 +26,7 @@ const USERS_DATA = {
         {
             id: 3,
             username: "abdulaziz",
-            email: "test@example.com",
+            email: "abdulaziz@example.com",
             status: "approved",
             isAdmin: false,
             createdAt: "2026-05-09"
@@ -49,8 +49,3 @@ const USERS_DATA = {
         }
     ]
 };
-
-// Untuk mengakses di file lain
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = USERS_DATA;
-}
