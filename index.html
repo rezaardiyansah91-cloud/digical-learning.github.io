@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digical IDE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #5f6368;
+            margin-bottom: 30px;
+        }
+        
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .menu-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(66, 133, 244, 0.4);
+        }
+        
+        .menu-btn.secondary {
+            background: linear-gradient(135deg, #fbbc04, #f29900);
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+                margin: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🚀</div>
+        <h1>Digical IDE</h1>
+        <div class="subtitle">Platform Komputasi & Desain Teknik</div>
+        
+        <div class="menu">
+            <a href="login.html" class="menu-btn">
+                <span>🔐</span> Login / Register
+            </a>
+            <a href="filemanager.html" class="menu-btn secondary">
+                <span>📁</span> File Manager
+            </a>
+        </div>
+        
+        <div class="info-box">
+            <strong>💡 Informasi:</strong><br>
+            • Login menggunakan username/email (tanpa password)<br>
+            • Pendaftaran membutuhkan approval admin<br>
+            • Kode admin: <code>admin123</code>
+        </div>
+        
+        <div class="status">
+            ✅ Sistem Siap Digunakan
+        </div>
+    </div>
+    
+    <script>
+        // Cek apakah user sudah login
+        const savedUser = localStorage.getItem('digical_current_user');
+        if (savedUser) {
+            try {
+                const user = JSON.parse(savedUser);
+                const menuDiv = document.querySelector('.menu');
+                const statusDiv = document.querySelector('.status');
+                
+                if (user.status === 'approved') {
+                    statusDiv.innerHTML = `✅ Login sebagai: <strong>${user.username}</strong>`;
+                    statusDiv.style.background = '#cce5ff';
+                    statusDiv.style.color = '#004085';
+                }
+            } catch(e) {}
+        }
+    </script>
+</body>
+</html>
