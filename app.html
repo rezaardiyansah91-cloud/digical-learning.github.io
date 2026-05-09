@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Digical IDE - Platform Komputasi & Desain Teknik</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #1a1a2e;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .logo span {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .username {
+            background: rgba(255,255,255,0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-back {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-back:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        /* Iframe Container */
+        .iframe-container {
+            height: calc(100vh - 60px);
+            width: 100%;
+            position: relative;
+            background: #f5f5f5;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            flex-direction: column;
+            transition: opacity 0.3s;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #e0e0e0;
+            border-top: 5px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #4285f4;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .loading-subtext {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Error Screen */
+        .error-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .error-card {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 450px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .error-card h2 {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+        
+        .error-card .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px 16px;
+            }
+            .logo {
+                font-size: 1em;
+            }
+            .username {
+                font-size: 0.8em;
+            }
+            .btn-logout, .btn-back {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Hide ngrok warning if possible - but we'll handle gracefully */
+        .iframe-container iframe {
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .iframe-container iframe.loaded {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Navbar akan diisi JavaScript -->
+        <div class="navbar" id="navbar" style="display: none;">
+            <div class="logo">
+                🚀 Digical IDE
+                <span>Beta</span>
+            </div>
+            <div class="user-info">
+                <span class="username" id="usernameDisplay"></span>
+                <button class="btn-back" onclick="goBack()">← Beranda</button>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        
+        <div class="iframe-container" id="iframeContainer">
+            <!-- Loading State -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <div class="loading-text">🚀 Memuat Digical IDE...</div>
+                <div class="loading-subtext">Mohon tunggu, platform sedang disiapkan</div>
+            </div>
+            
+            <!-- Iframe will be inserted here -->
+            <iframe id="digicalFrame" src="about:blank" title="Digical IDE Platform"></iframe>
+        </div>
+    </div>
+    
+    <script>
+        // ========== KONFIGURASI ==========
+        // Ganti dengan URL ngrok Anda
+        const NGROK_URL = 'https://intergyral-amatively-january.ngrok-free.dev/';
+        
+        // ========== CEK STATUS LOGIN ==========
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('digical_current_user');
+            
+            if (!savedUser) {
+                // Tidak login, redirect ke login
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            try {
+                const user = JSON.parse(savedUser);
+                
+                if (user.status !== 'approved') {
+                    // Login tapi belum approved atau di-suspend
+                    let message = '';
+                    if (user.status === 'pending') {
+                        message = 'Akun Anda masih menunggu approval admin.';
+                    } else if (user.status === 'suspended') {
+                        message = 'Akun Anda telah dinonaktifkan. Hubungi admin.';
+                    } else {
+                        message = 'Silakan login kembali.';
+                    }
+                    
+                    // Tampilkan pesan error sebelum redirect
+                    document.body.innerHTML = `
+                        <div class="error-screen">
+                            <div class="error-card">
+                                <h2>⚠️ Akses Ditolak</h2>
+                                <p>${message}</p>
+                                <a href="login.html" class="btn">Kembali ke Login</a>
+                            </div>
+                        </div>
+                    `;
+                    return null;
+                }
+                
+                return user;
+            } catch(e) {
+                window.location.href = 'login.html';
+                return null;
+            }
+        }
+        
+        // ========== SETUP UI ==========
+        function setupUI(user) {
+            // Tampilkan navbar
+            const navbar = document.getElementById('navbar');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            
+            navbar.style.display = 'flex';
+            usernameDisplay.innerHTML = `👋 ${escapeHtml(user.username)}`;
+            
+            // Setup iframe
+            setupIframe();
+        }
+        
+        // ========== SETUP IFRAME DENGAN LOADING HANDLER ==========
+        function setupIframe() {
+            const iframe = document.getElementById('digicalFrame');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Set iframe source
+            iframe.src = NGROK_URL;
+            
+            // Handle iframe load
+            iframe.onload = function() {
+                console.log('Iframe loaded successfully');
+                
+                // Sembunyikan loading dengan fade
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                    iframe.classList.add('loaded');
+                }, 500);
+            };
+            
+            // Handle iframe error
+            iframe.onerror = function() {
+                console.error('Failed to load iframe');
+                loadingOverlay.innerHTML = `
+                    <div style="text-align: center; color: #dc3545;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
+                        <div class="loading-text" style="color: #dc3545;">Gagal Memuat Platform</div>
+                        <div class="loading-subtext">Pastikan server ngrok sedang berjalan</div>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 25px; background: #4285f4; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            🔄 Coba Lagi
+                        </button>
+                        <button onclick="goBack()" style="margin-top: 10px; padding: 10px 25px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            ← Kembali ke Beranda
+                        </button>
+                    </div>
+                `;
+            };
+            
+            // Timeout jika loading terlalu lama
+            setTimeout(() => {
+                if (loadingOverlay.style.display !== 'none') {
+                    loadingOverlay.innerHTML = `
+                        <div style="text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 15px;">⏳</div>
+                            <div class="loading-text">Memuat memakan waktu lama...</div>
+                            <div class="loading-subtext">Server mungkin sedang memulai. Silakan tunggu atau refresh.</div>
+                            <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 25px; background: #4285f4; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                🔄 Refresh Halaman
+                            </button>
+                            <button onclick="goBack()" style="margin-top: 10px; padding: 10px 25px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                ← Kembali ke Beranda
+                            </button>
+                        </div>
+                    `;
+                }
+            }, 15000); // 15 detik timeout
+        }
+        
+        // ========== NAVIGATION FUNCTIONS ==========
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        function logout() {
+            localStorage.removeItem('digical_current_user');
+            window.location.href = 'login.html';
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ========== INITIALIZATION ==========
+        const currentUser = checkLoginStatus();
+        if (currentUser) {
+            setupUI(currentUser);
+        }
+        
+        // Handle page visibility - refresh session when tab becomes active
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // Cek lagi login status saat tab aktif kembali
+                const savedUser = localStorage.getItem('digical_current_user');
+                if (!savedUser) {
+                    window.location.href = 'login.html';
+                }
+            }
+        });
+        
+        // Prevent right-click on iframe to hide ngrok warning (optional)
+        document.addEventListener('contextmenu', function(e) {
+            // Tidak membatasi, biarkan user normal
+        });
+    </script>
+</body>
+</html>
