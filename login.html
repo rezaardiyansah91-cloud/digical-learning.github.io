@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digical IDE - Login</title>
+    <title>Digical IDE - Login & Registrasi</title>
     <style>
         * {
             margin: 0;
@@ -25,7 +25,7 @@
             background: white;
             border-radius: 20px;
             padding: 40px;
-            max-width: 450px;
+            max-width: 500px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: fadeInUp 0.5s ease-out;
@@ -46,7 +46,7 @@
             text-align: center;
             color: #4285f4;
             margin-bottom: 10px;
-            font-size: 2em;
+            font-size: 1.8em;
         }
         
         .subtitle {
@@ -100,6 +100,10 @@
             opacity: 0.95;
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(66, 133, 244, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
         }
         
         .message {
@@ -169,132 +173,30 @@
             margin-left: 8px;
         }
         
-        @media (max-width: 480px) {
-            .container {
-                padding: 25px;
-            }
+        /* Admin Dashboard Styles */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
         }
-    </style>
-</head>
-<body>
-    <div class="container" id="app">
-        <h1>🚀 Digical IDE</h1>
-        <div class="subtitle">Platform Komputasi & Desain Teknik</div>
         
-        <div id="message" class="message"></div>
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
         
-        <!-- Login Form -->
-        <div id="loginForm">
-            <div class="form-group">
-                <label>👤 Username atau Email</label>
-                <input type="text" id="loginUsername" placeholder="Masukkan username atau email">
-            </div>
-            <button onclick="handleLogin()">Login ke Digical IDE</button>
-            
-            <div class="links">
-                <a href="#" onclick="showRegister()">Belum punya akun? Register</a>
-                <a href="#" onclick="showAdminPanel()">🔐 Admin Panel</a>
-            </div>
-            
-            <div class="admin-info">
-                <strong>💡 Informasi:</strong> Sistem tanpa password. Login dengan username yang sudah terdaftar.
-                Admin dapat mengelola user di panel admin.
-            </div>
-        </div>
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+        }
         
-        <!-- Register Form -->
-        <div id="registerForm" style="display: none;">
-            <div class="form-group">
-                <label>👤 Username</label>
-                <input type="text" id="regUsername" placeholder="Nama pengguna">
-            </div>
-            <div class="form-group">
-                <label>📧 Email</label>
-                <input type="email" id="regEmail" placeholder="Email aktif">
-            </div>
-            <button onclick="handleRegister()">Daftar & Minta Approval</button>
-            
-            <div class="links">
-                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
-            </div>
-            
-            <div class="admin-info">
-                <strong>⚠️ Perhatian:</strong> Pendaftaran membutuhkan approval admin.
-                Setelah mendaftar, hubungi admin untuk aktivasi akun.
-            </div>
-        </div>
-        
-        <!-- Admin Panel -->
-        <div id="adminPanel" style="display: none;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
-                <h3 style="color: white;">🔐 Admin Panel</h3>
-                <p style="font-size: 12px; opacity: 0.9;">Kelola user & approval</p>
-            </div>
-            
-            <div class="form-group">
-                <label>🔑 Kode Admin</label>
-                <input type="password" id="adminCode" placeholder="Masukkan kode admin" value="admin123">
-            </div>
-            <button onclick="loginAdmin()">Login sebagai Admin</button>
-            
-            <div class="links">
-                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
-            </div>
-            
-            <div class="admin-info">
-                <strong>🔧 Kode Admin Default:</strong> <code>admin123</code><br>
-                <small>Ganti kode di file HTML untuk keamanan</small>
-            </div>
-        </div>
-        
-        <!-- Admin Dashboard -->
-        <div id="adminDashboard" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                <h3 style="color: #4285f4;">📊 Manajemen User</h3>
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="logoutAdmin()" style="width: auto; padding: 8px 15px; background: #5f6368;">Logout</button>
-                </div>
-            </div>
-            
-            <div id="adminStats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;"></div>
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-                <input type="text" id="searchUser" placeholder="🔍 Cari user..." style="flex: 1;" onkeyup="filterUsers()">
-                <select id="filterStatus" onchange="filterUsers()" style="width: auto;">
-                    <option value="all">Semua</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="suspended">Suspended</option>
-                </select>
-            </div>
-            
-            <div id="userList" style="max-height: 400px; overflow-y: auto;"></div>
-            
-            <div class="links">
-                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
-            </div>
-        </div>
-        
-        <!-- Main App (Redirect ke Digical IDE) -->
-        <div id="mainApp" style="display: none; text-align: center;">
-            <div style="margin-bottom: 20px;">
-                <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #4285f4; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto;"></div>
-                <h3>🚀 Mengalihkan ke Digical IDE...</h3>
-                <p id="welcomeUser" style="color: #5f6368; margin-top: 10px;"></p>
-            </div>
-            <button onclick="openDigicalIDE()" style="width: auto; padding: 12px 30px; background: linear-gradient(135deg, #4285f4, #34a853);">
-                <i>🚀</i> Buka Digical IDE
-            </button>
-            <button onclick="logout()" style="width: auto; padding: 12px 30px; background: #5f6368; margin-top: 10px;">
-                Logout
-            </button>
-        </div>
-    </div>
-    
-    <style>
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
         }
         
         .user-card {
@@ -346,6 +248,7 @@
         .user-actions {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
         
         .user-actions button {
@@ -359,36 +262,158 @@
         .btn-suspend { background: #ffc107; color: #333; }
         .btn-delete { background: #dc3545; }
         .btn-reactivate { background: #17a2b8; }
+        .btn-export { background: #6c757d; }
         
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
-        .stat-number {
-            font-size: 28px;
-            font-weight: bold;
+        .filter-bar input, .filter-bar select {
+            flex: 1;
+            min-width: 150px;
         }
         
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.9;
+        .user-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            .stats-grid {
+                gap: 8px;
+            }
+            .stat-number {
+                font-size: 20px;
+            }
+            .user-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .user-actions {
+                justify-content: center;
+            }
         }
     </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <h1>🚀 Digical IDE</h1>
+        <div class="subtitle" id="pageSubtitle">Login untuk mengakses platform</div>
+        
+        <div id="message" class="message"></div>
+        
+        <!-- ========== LOGIN FORM ========== -->
+        <div id="loginForm">
+            <div class="form-group">
+                <label>👤 Username atau Email</label>
+                <input type="text" id="loginUsername" placeholder="Masukkan username atau email">
+            </div>
+            <button onclick="handleLogin()">🔐 Login ke Digical IDE</button>
+            
+            <div class="links">
+                <a href="#" onclick="showRegister()">📝 Belum punya akun? Register</a>
+                <a href="#" onclick="showAdminPanel()">🔑 Admin Panel</a>
+                <a href="index.html">🏠 Home</a>
+            </div>
+            
+            <div class="admin-info">
+                <strong>💡 Informasi:</strong> Sistem tanpa password. Login dengan username/email yang sudah terdaftar dan di-approve admin.
+            </div>
+        </div>
+        
+        <!-- ========== REGISTER FORM ========== -->
+        <div id="registerForm" style="display: none;">
+            <div class="form-group">
+                <label>👤 Username</label>
+                <input type="text" id="regUsername" placeholder="Nama pengguna">
+            </div>
+            <div class="form-group">
+                <label>📧 Email</label>
+                <input type="email" id="regEmail" placeholder="Email aktif">
+            </div>
+            <button onclick="handleRegister()">📝 Daftar & Minta Approval</button>
+            
+            <div class="links">
+                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
+            </div>
+            
+            <div class="admin-info">
+                <strong>⚠️ Perhatian:</strong> Pendaftaran membutuhkan approval admin. Hubungi admin setelah mendaftar.
+            </div>
+        </div>
+        
+        <!-- ========== ADMIN LOGIN PANEL ========== -->
+        <div id="adminPanel" style="display: none;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+                <h3 style="color: white;">🔐 Admin Panel</h3>
+                <p style="font-size: 12px; opacity: 0.9;">Kelola user & approval</p>
+            </div>
+            
+            <div class="form-group">
+                <label>🔑 Kode Admin</label>
+                <input type="password" id="adminCode" placeholder="Masukkan kode admin">
+            </div>
+            <button onclick="loginAdmin()">Login sebagai Admin</button>
+            
+            <div class="links">
+                <a href="#" onclick="showLogin()">← Kembali ke Login</a>
+            </div>
+            
+            <div class="admin-info">
+                <strong>🔧 Kode Admin Default:</strong> <code>admin123</code><br>
+                <small>Ganti kode di file JavaScript untuk keamanan</small>
+            </div>
+        </div>
+        
+        <!-- ========== ADMIN DASHBOARD ========== -->
+        <div id="adminDashboard" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="color: #4285f4;">📊 Manajemen User</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="exportUserData()" class="btn-export" style="width: auto; background: #17a2b8;">💾 Export Data</button>
+                    <button onclick="showImportDialog()" class="btn-export" style="width: auto; background: #6c757d;">📥 Import Data</button>
+                    <button onclick="logoutAdmin()" style="width: auto; background: #dc3545;">Logout</button>
+                </div>
+            </div>
+            
+            <div id="adminStats" class="stats-grid"></div>
+            
+            <div class="filter-bar">
+                <input type="text" id="searchUser" placeholder="🔍 Cari user..." onkeyup="filterUsers()">
+                <select id="filterStatus" onchange="filterUsers()">
+                    <option value="all">Semua Status</option>
+                    <option value="pending">⏳ Pending</option>
+                    <option value="approved">✅ Approved</option>
+                    <option value="suspended">⏸️ Suspended</option>
+                </select>
+            </div>
+            
+            <div id="userList" class="user-list"></div>
+            
+            <button onclick="showLogin()" class="back-btn">← Kembali ke Login</button>
+        </div>
+    </div>
     
     <script>
-        // Konfigurasi
-        const ADMIN_CODE = 'admin123'; // Ganti dengan kode rahasia Anda
+        // ========== KONFIGURASI ==========
+        const ADMIN_CODE = 'admin123'; // Ganti dengan kode admin Anda
         
-        // Data users disimpan di localStorage
+        // ========== DATA USER (LocalStorage) ==========
         let users = [];
-        let currentUser = null;
-        let isAdminLoggedIn = false;
+        let currentAdminLoggedIn = false;
         
-        // Inisialisasi data default
+        // Inisialisasi data
         function initData() {
             const savedUsers = localStorage.getItem('digical_users');
             if (savedUsers) {
@@ -429,7 +454,7 @@
             localStorage.setItem('digical_users', JSON.stringify(users));
         }
         
-        // Tampilkan pesan
+        // ========== UTILITY FUNCTIONS ==========
         function showMessage(msg, type = 'error') {
             const msgDiv = document.getElementById('message');
             msgDiv.textContent = msg;
@@ -441,7 +466,13 @@
             }, 4000);
         }
         
-        // Login handler
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ========== LOGIN FUNCTIONS ==========
         function handleLogin() {
             const username = document.getElementById('loginUsername').value.trim();
             
@@ -450,7 +481,6 @@
                 return;
             }
             
-            // Cari user
             const user = users.find(u => 
                 u.username.toLowerCase() === username.toLowerCase() || 
                 u.email.toLowerCase() === username.toLowerCase()
@@ -462,22 +492,25 @@
             }
             
             if (user.status === 'pending') {
-                showMessage('Akun Anda masih menunggu approval admin. Silakan hubungi admin untuk aktivasi.', 'error');
+                showMessage('⏳ Akun Anda masih menunggu approval admin. Hubungi admin untuk aktivasi.', 'error');
                 return;
             }
             
             if (user.status === 'suspended') {
-                showMessage('Akun Anda telah dinonaktifkan. Hubungi admin untuk informasi lebih lanjut.', 'error');
+                showMessage('⚠️ Akun Anda telah dinonaktifkan. Hubungi admin untuk informasi lebih lanjut.', 'error');
                 return;
             }
             
             // Login berhasil
-            currentUser = user;
             localStorage.setItem('digical_current_user', JSON.stringify(user));
-            showMainApp();
+            showMessage(`✅ Selamat datang, ${user.username}! Mengalihkan...`, 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'app.html';
+            }, 1500);
         }
         
-        // Register handler
+        // ========== REGISTER FUNCTIONS ==========
         function handleRegister() {
             const username = document.getElementById('regUsername').value.trim();
             const email = document.getElementById('regEmail').value.trim();
@@ -492,7 +525,6 @@
                 return;
             }
             
-            // Cek duplikat
             const existing = users.find(u => 
                 u.username.toLowerCase() === username.toLowerCase() || 
                 u.email.toLowerCase() === email.toLowerCase()
@@ -503,7 +535,6 @@
                 return;
             }
             
-            // Buat user baru
             const newUser = {
                 id: Date.now(),
                 username: username,
@@ -518,13 +549,13 @@
             
             showMessage(`✅ Pendaftaran berhasil! Akun "${username}" menunggu approval admin.`, 'success');
             
-            // Reset form dan kembali ke login
+            // Reset form
             document.getElementById('regUsername').value = '';
             document.getElementById('regEmail').value = '';
             showLogin();
         }
         
-        // Admin login
+        // ========== ADMIN FUNCTIONS ==========
         function loginAdmin() {
             const code = document.getElementById('adminCode').value;
             
@@ -533,12 +564,12 @@
                 return;
             }
             
-            isAdminLoggedIn = true;
+            currentAdminLoggedIn = true;
             showAdminDashboard();
         }
         
         function logoutAdmin() {
-            isAdminLoggedIn = false;
+            currentAdminLoggedIn = false;
             showLogin();
         }
         
@@ -546,8 +577,8 @@
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'block';
+            document.getElementById('pageSubtitle').textContent = 'Admin Dashboard - Kelola User';
             
             renderAdminDashboard();
         }
@@ -560,16 +591,16 @@
             
             document.getElementById('adminStats').innerHTML = `
                 <div class="stat-card">
+                    <div class="stat-number">${users.length}</div>
+                    <div class="stat-label">Total User</div>
+                </div>
+                <div class="stat-card">
                     <div class="stat-number">${pendingCount}</div>
                     <div class="stat-label">Pending</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">${approvedCount}</div>
                     <div class="stat-label">Aktif</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${suspendedCount}</div>
-                    <div class="stat-label">Suspended</div>
                 </div>
             `;
             
@@ -675,13 +706,57 @@
             }
         }
         
-        // UI Navigation
+        // ========== EXPORT/IMPORT DATA ==========
+        function exportUserData() {
+            const data = {
+                users: users,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `digical_users_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showMessage('✅ Data user berhasil diekspor!', 'success');
+        }
+        
+        function showImportDialog() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        if (importedData.users && Array.isArray(importedData.users)) {
+                            users = importedData.users;
+                            saveUsers();
+                            showMessage('✅ Data user berhasil diimpor!', 'success');
+                            renderAdminDashboard();
+                        } else {
+                            showMessage('❌ Format file tidak valid!', 'error');
+                        }
+                    } catch(err) {
+                        showMessage('❌ Gagal membaca file: ' + err.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        // ========== UI NAVIGATION ==========
         function showLogin() {
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('pageSubtitle').textContent = 'Login untuk mengakses platform';
             document.getElementById('message').className = 'message';
             document.getElementById('message').textContent = '';
             document.getElementById('loginUsername').value = '';
@@ -692,7 +767,7 @@
             document.getElementById('registerForm').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('pageSubtitle').textContent = 'Daftar akun baru';
         }
         
         function showAdminPanel() {
@@ -700,64 +775,13 @@
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('pageSubtitle').textContent = 'Admin Login';
             document.getElementById('adminCode').value = '';
         }
         
-        function showMainApp() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            
-            document.getElementById('welcomeUser').innerHTML = `Selamat datang, <strong>${escapeHtml(currentUser?.username || '')}</strong>!`;
-        }
-        
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('digical_current_user');
-            showLogin();
-        }
-        
-        function openDigicalIDE() {
-            // Buka link Digical IDE
-            window.open('https://intergyral-amatively-january.ngrok-free.dev/', '_blank');
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        // Cek session yang tersimpan
-        function checkSavedSession() {
-            const savedUser = localStorage.getItem('digical_current_user');
-            if (savedUser) {
-                try {
-                    const user = JSON.parse(savedUser);
-                    // Verifikasi user masih ada dan aktif
-                    const existingUser = users.find(u => u.id === user.id);
-                    if (existingUser && existingUser.status === 'approved') {
-                        currentUser = existingUser;
-                        showMainApp();
-                        return true;
-                    } else {
-                        localStorage.removeItem('digical_current_user');
-                    }
-                } catch(e) {
-                    localStorage.removeItem('digical_current_user');
-                }
-            }
-            return false;
-        }
-        
-        // Inisialisasi
+        // ========== INITIALIZATION ==========
         initData();
-        if (!checkSavedSession()) {
-            showLogin();
-        }
+        showLogin();
     </script>
 </body>
 </html>
