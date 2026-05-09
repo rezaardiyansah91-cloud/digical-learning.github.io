@@ -25,7 +25,7 @@
             background: white;
             border-radius: 20px;
             padding: 40px;
-            max-width: 500px;
+            max-width: 450px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             text-align: center;
@@ -86,10 +86,6 @@
             box-shadow: 0 10px 25px rgba(66, 133, 244, 0.4);
         }
         
-        .menu-btn.secondary {
-            background: linear-gradient(135deg, #fbbc04, #f29900);
-        }
-        
         .info-box {
             background: #f8f9fa;
             padding: 15px;
@@ -97,16 +93,36 @@
             margin-top: 20px;
             font-size: 12px;
             color: #666;
+            text-align: left;
+        }
+        
+        .info-box strong {
+            color: #4285f4;
         }
         
         .status {
             display: inline-block;
-            padding: 5px 12px;
+            padding: 8px 16px;
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+        
+        .status.success {
             background: #d4edda;
             color: #155724;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-top: 15px;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.info {
+            background: #cce5ff;
+            color: #004085;
         }
         
         @media (max-width: 480px) {
@@ -127,20 +143,17 @@
             <a href="login.html" class="menu-btn">
                 <span>🔐</span> Login / Admin Panel
             </a>
-            <a href="filemanager.html" class="menu-btn secondary">
-                <span>📁</span> File Manager
-            </a>
         </div>
         
         <div class="info-box">
             <strong>💡 Informasi:</strong><br>
-            • Login menggunakan username/email<br>
-            • Kode admin: <code>admin123</code><br>
-            • Data user ada di file <code>users.js</code>
+            • Login menggunakan username/email yang sudah terdaftar<br>
+            • Hubungi admin untuk pendaftaran akun baru<br>
+            • Data user dikelola oleh admin melalui file users.js
         </div>
         
-        <div class="status" id="statusDisplay">
-            🔍 Sistem Siap Digunakan
+        <div id="statusDisplay" class="status">
+            🔍 Memeriksa status login...
         </div>
     </div>
     
@@ -153,27 +166,22 @@
             try {
                 const user = JSON.parse(savedUser);
                 if (user.status === 'approved') {
-                    statusDiv.innerHTML = `✅ Login sebagai: <strong>${user.username}</strong> | <a href="app.html" style="color: #155724;">Langsung buka IDE →</a>`;
-                    statusDiv.style.background = '#cce5ff';
-                    statusDiv.style.color = '#004085';
+                    statusDiv.innerHTML = `✅ Login sebagai: <strong>${user.username}</strong> | <a href="app.html" style="color: #155724; text-decoration: none;">🚀 Langsung buka IDE →</a>`;
+                    statusDiv.className = 'status success';
                 } else if (user.status === 'pending') {
-                    statusDiv.innerHTML = `⏳ Akun <strong>${user.username}</strong> menunggu approval admin`;
-                    statusDiv.style.background = '#fff3cd';
-                    statusDiv.style.color = '#856404';
+                    statusDiv.innerHTML = `⏳ Akun <strong>${user.username}</strong> masih menunggu approval admin`;
+                    statusDiv.className = 'status warning';
                 } else {
-                    statusDiv.innerHTML = `⚠️ Akun <strong>${user.username}</strong> dinonaktifkan. Hubungi admin.`;
-                    statusDiv.style.background = '#f8d7da';
-                    statusDiv.style.color = '#721c24';
+                    statusDiv.innerHTML = `⚠️ Akun <strong>${user.username}</strong> telah dinonaktifkan. Hubungi admin.`;
+                    statusDiv.className = 'status';
                 }
             } catch(e) {
                 statusDiv.innerHTML = `❌ Silakan login untuk mengakses Digical IDE`;
-                statusDiv.style.background = '#f8d7da';
-                statusDiv.style.color = '#721c24';
+                statusDiv.className = 'status';
             }
         } else {
             statusDiv.innerHTML = `❌ Belum login. Silakan login terlebih dahulu.`;
-            statusDiv.style.background = '#f8d7da';
-            statusDiv.style.color = '#721c24';
+            statusDiv.className = 'status';
         }
     </script>
 </body>
